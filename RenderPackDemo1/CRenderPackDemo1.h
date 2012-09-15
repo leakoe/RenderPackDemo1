@@ -140,7 +140,7 @@ protected:
 	CD3D11RenderMeshRef m_rRenderMesh;
 	CD3D11RenderMeshRef m_rRenderMeshFace;
 	CD3D11InputLayoutRef m_rMeshLayout;
-	CD3D11InputLayoutRef m_rMeshLayoutFace;
+	ID3D11InputLayout *m_rMeshLayoutFace;
 
 	//vertexBuffer for the FaceMesh
 	hlsl::vector<float,4> * m_vertexData;
@@ -154,6 +154,7 @@ protected:
 	ID3D11Buffer* m_indexBuffer;
 	WORD *m_faceIndices;
 
+	
 	//constant buffers
 	CD3D11ConstantBufferRef m_rCBObjectTransform;
 	CD3D11ConstantBufferRef m_rCBObjectFaceAUs;

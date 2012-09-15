@@ -96,12 +96,12 @@
     <ClCompile Include="Visualize.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\FaceTrackingVisualization\SingleFace\Visualize.h" />
     <ClInclude Include="CRenderPackDemo1.h" />
     <ClInclude Include="FTHelper.h" />
     <ClInclude Include="KinectSensor.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Visualize.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="F:\RenderPack\RenderPackDemo2\Resources\sponza_noflag.mtl" />

@@ -12,6 +12,7 @@ struct VS_OUTPUT
 };
 
 StructuredBuffer<float3> 	g_Positions		: register(t0);
+Buffer<int> g_Indices : register(t1);
 
 //--------------------------------------------------------------------------------------
 // Vertex Shader
@@ -22,7 +23,6 @@ VS_OUTPUT VSMain( VS_INPUT Input, uint vidx	: SV_VertexID )
 	VS_OUTPUT Output;
 
 	float4 vpos = float4(g_Positions[vidx], 1.0f);
-	
 	Output.pos = mul( vpos, g_mWorldViewProj );
 	
 	return Output;

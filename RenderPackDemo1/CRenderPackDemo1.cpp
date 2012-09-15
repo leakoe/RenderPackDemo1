@@ -228,6 +228,7 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	if(FAILED(pDevice->CreateBuffer(&bd, &InitDataV, &m_vertexBuffer)))
 		return false;
 
+	
 	SYSLOG("CRPD1.OCD",1,"createbuffer vertex");
 
 	//indexbuffer
@@ -329,6 +330,7 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	rPSTextured->BindSampler(0, rSamLinear);
 
 	VertexShaderResourceRef rVSTexturedF = UseVSResource(L"VSTexturedF", pDevice, L"Resources\\Shaders\\VS_TexturedF.hlsl", "VSMain");
+	
 	rVSTexturedF->BindConstantBuffer(0, m_rCBObjectFaceAUs);
 
 
@@ -351,6 +353,14 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 		);
 
 	//create input layouts
+	D3D11_INPUT_ELEMENT_DESC layout[] = {{"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0}};
+	UINT numElements = ARRAYSIZE(layout);
+
+	/*if( FAILED(pDevice->CreateInputLayout(layout, numElements, rVSTexturedF, sizeof(m_vertexBuffer), &m_rMeshLayoutFace)))
+		return FALSE;*/
+
+		
+
 	m_rMeshLayout = new CD3D11InputLayout(m_rRenderMesh->GetRenderGeometry(), rVSTextured);
 	//m_rMeshLayoutFace = new CD3D11InputLayout(m_rRenderMeshFace->GetRenderGeometry(), rVSTexturedF);
 	
@@ -439,7 +449,6 @@ void CRenderPackDemo1::ParseObjInput() {
 	int nVerts = 0;
 	int nFaces = 0;
 
-	
 	//file input
 	char strMatFileName[MAX_PATH];
 	char strCommand[MAX_PATH];
@@ -847,7 +856,6 @@ void CRenderPackDemo1::FacetrackingFrustum(float monitorWidth, float monitorHeig
 
 	//SYSLOG("CRPD1::FTF",1,"x1-x0 "<<(x1-x0)<<" y1-y0 "<<(y1-y0)<<" y1/z0 "<<(y1/z0));
 	//SYSLOG("CRenderPackDemo1-FrameRender",1,"onframerender "<<x0<<" "<<x1<<" "<<y0<<" "<<y1<<" "<<z0<<" "<<z1);
-
 }
 
 void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext* pImmediateContext)
@@ -858,7 +866,7 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	UINT stride = sizeof(hlsl::float4);
 	UINT offset = 0;
 	pImmediateContext->IASetVertexBuffers(0,1,&m_vertexBuffer,&stride, &offset);
-
+	
 	//Set Index Buffer
 	pImmediateContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
@@ -898,7 +906,6 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	hlsl::float4x4 mWorldViewProj = mul(mul(mWorld, mView), mProj);
 	//hlsl::float4x4 mWorldViewProjF = mul(mul(mFWorld, mFView), mFProj);
 
-
 	//update constant buffer
 	m_rCBObjectTransform->Map(pImmediateContext);
 		CB_PER_OBJECT* pMappedData = (CB_PER_OBJECT*)m_rCBObjectTransform->GetDataPtr();
@@ -906,10 +913,10 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	m_rCBObjectTransform->Unmap(pImmediateContext);
 
 
-	//m_rCBObjectFaceAUs->Map(pImmediateContext);
-	//	CB_PER_OBJECT* pMappedDataF = (CB_PER_OBJECT*)m_rCBObjectFaceAUs->GetDataPtr();
-	//	pMappedDataF->mWorldViewProj = mWorldViewProjF;
-	//m_rCBObjectFaceAUs->Unmap(pImmediateContext);
+	m_rCBObjectFaceAUs->Map(pImmediateContext);
+		CB_PER_OBJECT* pMappedDataF = (CB_PER_OBJECT*)m_rCBObjectFaceAUs->GetDataPtr();
+		pMappedDataF->mWorldViewProj = mWorldViewProj;
+	m_rCBObjectFaceAUs->Unmap(pImmediateContext);
 
 
 	m_rContextManager->PushRenderTargets(m_rColorTarget);
@@ -936,6 +943,8 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	m_rRenderMesh->EndDraw(pImmediateContext);
 
 	m_rContextManager->PopRenderTargets();
+
+//	pImmediateContext->IASetInputLayout(m_rMeshLayoutFace);
 
 	//m_rContextManager->PushRenderTargets(m_rColorTarget);
 
