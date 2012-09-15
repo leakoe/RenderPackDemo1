@@ -1,0 +1,23 @@
+﻿1>------ Build started: Project: RenderPackDemo1, Configuration: Debug Win32 ------
+1>Build started 11.07.2012 18:14:50.
+1>InitializeBuildStatus:
+1>  Touching "Debug\RenderPackDemo1.unsuccessfulbuild".
+1>ClCompile:
+1>  CRenderPackDemo1.cpp
+1>c:\users\lakoecke\documents\visual studio 2010\projects\renderpackdemo1\renderpackdemo1\crenderpackdemo1.cpp(297): warning C4244: 'initializing' : conversion from 'const UINT' to 'FLOAT', possible loss of data
+1>c:\users\lakoecke\documents\visual studio 2010\projects\renderpackdemo1\renderpackdemo1\crenderpackdemo1.cpp(298): warning C4244: 'initializing' : conversion from 'const UINT' to 'FLOAT', possible loss of data
+1>c:\users\lakoecke\documents\visual studio 2010\projects\renderpackdemo1\renderpackdemo1\crenderpackdemo1.cpp(199): warning C6011: Dereferencing NULL pointer 'pFT': Lines: 110, 113, 114, 117, 118, 120, 121, 123, 124, 127, 129, 131, 132, 133, 135, 138, 139, 141, 142, 145, 154, 158, 159, 160, 164, 165, 167, 168, 171, 172, 174, 175, 178, 188, 191, 192, 196, 197, 199
+1>c:\users\lakoecke\documents\visual studio 2010\projects\renderpackdemo1\renderpackdemo1\crenderpackdemo1.cpp(219): warning C6011: Dereferencing NULL pointer 'pColorFrame': Lines: 110, 113, 114, 117, 118, 120, 121, 123, 124, 127, 129, 131, 132, 133, 135, 138, 139, 141, 142, 145, 154, 158, 159, 160, 164, 165, 167, 168, 171, 172, 174, 175, 178, 188, 191, 192, 196, 197, 199, 200, 205, 206, 207, 212,213, 214, 219
+1>c:\users\lakoecke\documents\visual studio 2010\projects\renderpackdemo1\renderpackdemo1\crenderpackdemo1.cpp(220): warning C6011: Dereferencing NULL pointer 'pDepthFrame': Lines: 110, 113, 114, 117, 118, 120, 121, 123, 124, 127, 129, 131, 132, 133, 135, 138, 139, 141, 142, 145, 154, 158, 159, 160, 164, 165, 167, 168, 171, 172, 174, 175, 178, 188, 191, 192, 196, 197, 199, 200, 205, 206, 207, 212,213, 214, 219, 220
+1>c:\users\lakoecke\documents\visual studio 2010\projects\renderpackdemo1\renderpackdemo1\crenderpackdemo1.cpp(501): warning C6031: Return value ignored: 'GetKeyboardState'
+1>c:\users\lakoecke\documents\visual studio 2010\projects\renderpackdemo1\renderpackdemo1\crenderpackdemo1.cpp(549): warning C6031: Return value ignored: 'GetKeyboardState'
+1>ManifestResourceCompile:
+1>  All outputs are up-to-date.
+1>CRenderPackDemo1.obj : error LNK2019: unresolved external symbol __imp__FTCreateImage@0 referenced in function "public: virtual long __thiscall CRenderPackDemo1::OnCreateDevice(struct ID3D11Device *)" (?OnCreateDevice@CRenderPackDemo1@@UAEJPAUID3D11Device@@@Z)
+1>CRenderPackDemo1.obj : error LNK2019: unresolved external symbol __imp__FTCreateFaceTracker@4 referenced in function "public: virtual long __thiscall CRenderPackDemo1::OnCreateDevice(struct ID3D11Device *)" (?OnCreateDevice@CRenderPackDemo1@@UAEJPAUID3D11Device@@@Z)
+1>C:\Users\lakoecke\Documents\Visual Studio 2010\Projects\RenderPackDemo1\Debug\RenderPackDemo1.exe : fatal error LNK1120: 2 unresolved externals
+1>
+1>Build FAILED.
+1>
+1>Time Elapsed 00:00:05.91
+========== Build: 0 succeeded, 1 failed, 0 up-to-date, 0 skipped ==========

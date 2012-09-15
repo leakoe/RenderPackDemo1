@@ -1,0 +1,219 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="CRenderPackDemo1.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="FTHelper.cpp" />
+    <ClCompile Include="Visualize.cpp" />
+    <ClCompile Include="KinectSensor.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CRenderPackDemo1.h" />
+    <ClInclude Include="..\..\..\..\FaceTrackingVisualization\SingleFace\Visualize.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="FTHelper.h" />
+    <ClInclude Include="KinectSensor.h" />
+    <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{060f4a4a-d1dc-4e40-9646-544e72d32cff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Shaders">
+      <UniqueIdentifier>{f880967d-58cd-40cc-b4cf-7c58c290faef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Textures">
+      <UniqueIdentifier>{f268ab53-dede-4567-a7db-61617c7fd4b3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Shaders\PS_FullQuad.hlsl">
+      <Filter>Resources\Shaders</Filter>
+    </None>
+    <None Include="Resources\Shaders\PS_Textured.hlsl">
+      <Filter>Resources\Shaders</Filter>
+    </None>
+    <None Include="Resources\Shaders\VS_FullQuad.hlsl">
+      <Filter>Resources\Shaders</Filter>
+    </None>
+    <None Include="Resources\Shaders\VS_Textured.hlsl">
+      <Filter>Resources\Shaders</Filter>
+    </None>
+    <None Include="Resources\Shaders\Common.hlsl">
+      <Filter>Resources\Shaders</Filter>
+    </None>
+    <None Include="Resources\Textures\lion.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\lion_ddn.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\lion2_ddn.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\spnza_bricks_a_ddn.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\spnza_bricks_a_diff.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\spnza_bricks_a_spec.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_arch_ddn.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_arch_diff.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_arch_spec.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_ceiling_a_diff.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_ceiling_a_spec.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_column_a_ddn.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_column_a_diff.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_column_a_spec.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_column_b_ddn.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_column_b_diff.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_column_b_spec.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_column_c_ddn.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_column_c_diff.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_column_c_spec.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_curtain_blue_diff.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_curtain_diff.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_curtain_green_diff.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_details_diff.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_details_spec.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_fabric_blue_diff.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_fabric_diff.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_fabric_green_diff.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_fabric_spec.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_flagpole_diff.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_flagpole_spec.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_floor_a_diff.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_floor_a_spec.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_roof_diff.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_thorn_ddn.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_thorn_diff.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_thorn_mask.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\sponza_thorn_spec.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\vase_ddn.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\vase_dif.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\vase_hanging.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\vase_plant.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\vase_plant_mask.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\vase_plant_spec.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\vase_round.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\vase_round_ddn.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\vase_round_spec.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\background.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\background_ddn.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\chain_texture.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\chain_texture_ddn.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="Resources\Textures\chain_texture_mask.tif">
+      <Filter>Resources\Textures</Filter>
+    </None>
+    <None Include="F:\RenderPack\RenderPackDemo2\Resources\sponza_noflag.mtl">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="monitor.txt" />
+    <None Include="Resources\cup.jpg">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="Resources\cup.mtl">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="Resources\Shaders\VS_TexturedF.hlsl">
+      <Filter>Resources\Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="RenderPackDemo1.rc" />
+  </ItemGroup>
+</Project>
