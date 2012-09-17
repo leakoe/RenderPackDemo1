@@ -137,16 +137,16 @@ bool CRenderPackDemo1::Init()
 	m_CurrTranslateSpeed = float3(0.f,0.f,0.f);
 //	hlsl::float4x4 camTransform = hlsl::translation<float, 4, 4>(hlsl::float3(0.01f, 0.01f, 0.01f));
 	//###hlsl::float4x4 camTransform = hlsl::translation<float, 4, 4>(hlsl::float3(0.16f, 0.33f, 0.01f)); 
-	hlsl::float4x4 camTransform = hlsl::translation<float, 4, 4>(hlsl::float3(0.16f, .1f, 0.01f));
+	hlsl::float4x4 camFaceTransform = hlsl::translation<float, 4, 4>(hlsl::float3(0.16f, .1f, 0.01f));
 	m_rCam = new CCamera(); 
-	m_rCam->SetLocalTransform(camTransform); 
+	m_rCam->SetLocalTransform(camFaceTransform); 
 	m_rCam->SetViewParams(hlsl::float3(0.0f, .1f, 0.f), hlsl::float3(0, 1.0f, 0)); 
 	m_rCam->ForceUpVector(true);
 	m_rCam->SetProjParams(1.6f, 0.78f, 0.04f, 100000.0f);
 	
-	hlsl::float4x4 camFaceTransform = hlsl::translation<float, 4, 4>(hlsl::float3(0.f, -.2f, 2.f));
+	hlsl::float4x4 camTransform = hlsl::translation<float, 4, 4>(hlsl::float3(0.f, -.2f, 2.f));
 	m_rFaceCam = new CCamera(); 
-	m_rFaceCam->SetLocalTransform(camFaceTransform); 
+	m_rFaceCam->SetLocalTransform(camTransform); 
 	m_rFaceCam->SetViewParams(hlsl::float3(0.0f, -.2f, 0.f), hlsl::float3(0, 1.0f, 0)); 
 	m_rFaceCam->ForceUpVector(true);
 	m_rFaceCam->SetProjParams(1.6f, 0.78f, 0.04f, 100000.0f);
@@ -161,7 +161,7 @@ bool CRenderPackDemo1::Init()
 	x0 = -x1;
 	// control the camera
 	m_rFreeFlight = new CFreeFlightController();	
-	m_rFreeFlight->SetControlTarget(m_rCam);
+	m_rFreeFlight->SetControlTarget(m_rFaceCam);
 	m_rFreeFlight->SetInvertMouse(true);
 	AddAnimatable(m_rFreeFlight);
 	AddMessageHandler(m_rFreeFlight);
@@ -331,6 +331,8 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 
 	VertexShaderResourceRef rVSTexturedF = UseVSResource(L"VSTexturedF", pDevice, L"Resources\\Shaders\\VS_TexturedF.hlsl", "VSMain");
 	
+	
+
 	rVSTexturedF->BindConstantBuffer(0, m_rCBObjectFaceAUs);
 
 
@@ -353,13 +355,15 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 		);
 
 	//create input layouts
-
+	D3D11_INPUT_ELEMENT_DESC layout[] = {{"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0}};
+	UINT numElements = ARRAYSIZE(layout);
 	//((CD3D11VertexShaderRef)rVSTexturedF)->CreateInputLayout(layout, numElements, &m_rMeshLayoutFace);
-		
-
+	CD3D11VertexShader vertexShader = static_cast<CD3D11VertexShader>( m_rFacePass->GetVertexShader());	
+	vertexShader.CompileOnDevice(pDevice);
+	vertexShader.CreateInputLayout(layout, numElements, &m_rMeshLayoutFace);
 	m_rMeshLayout = new CD3D11InputLayout(m_rRenderMesh->GetRenderGeometry(), rVSTextured);
 	//m_rMeshLayoutFace = new CD3D11InputLayout(m_rRenderMeshFace->GetRenderGeometry(), rVSTexturedF);
-		
+
 	//always call this in the last line! (this will setup the magic resource management behind the scenes)
 	V_RETURN_HR( CSimpleApp11::OnCreateDevice(pDevice) );
 
@@ -857,22 +861,7 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 {
 	CSimpleApp11::OnFrameRender(pDevice, pImmediateContext);
 	
-	D3D11_INPUT_ELEMENT_DESC layout[] = {{"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0}};
-	UINT numElements = ARRAYSIZE(layout);
 
-	if( FAILED(pDevice->CreateInputLayout(layout, numElements, m_rFacePass->GetVertexShader()->GetLastSnapshot(),113*3, &m_rMeshLayoutFace))) {
-		SYSLOG("CRPD1.OCD",1,"Failed to create input Layout");
-		//return FALSE;
-	}
-
-
-		//Set Vertex Buffer
-	UINT stride = sizeof(hlsl::float4);
-	UINT offset = 0;
-	pImmediateContext->IASetVertexBuffers(0,1,&m_vertexBuffer,&stride, &offset);
-	
-	//Set Index Buffer
-	pImmediateContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
 
 	// render the scene from the camera
@@ -882,14 +871,14 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	//m_rMeshResourceFace->GetTriMesh()->GetWorldTransform(&mFWorld);
 	m_rMeshResource->GetTriMesh()->GetWorldTransform(&mWorld);
 	mView = *m_rCam->GetViewMatrix();
-	//mFView = *m_rFaceCam->GetViewMatrix();
-	hlsl::float4x4 scalerF = hlsl::scale<float,4,4>(hlsl::float3(1.0,1.0,1.0));
+	mFView = *m_rFaceCam->GetViewMatrix();
+	hlsl::float4x4 scalerF = hlsl::scale<float,4,4>(hlsl::float3(1000.0,1000.0,1000.0));
 	hlsl::float4x4 scaler = hlsl::scale<float,4,4>(hlsl::float3(10.0,10.0,10.0));
 	hlsl::float4x4 translateMatrix = hlsl::translation<float,4,4>(translateOffset);
-	//mFView = mul(scalerF, mFView);
+	mFView = mul(scalerF, mFView);
 	mView = mul(scaler, mView);
 	mProj = *m_rCam->GetProjMatrix();
-	//mFProj = *m_rFaceCam->GetProjMatrix();
+	mFProj = *m_rFaceCam->GetProjMatrix();
 
 	if(m_IsFaceTracked) {//####
 		mProj =  m_ftfrustum;
@@ -908,7 +897,7 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 		SYSLOG("CRenderPackDemo1", 1, "mView, translateOffset"<<translateOffset);*/
 
 	hlsl::float4x4 mWorldViewProj = mul(mul(mWorld, mView), mProj);
-	//hlsl::float4x4 mWorldViewProjF = mul(mul(mFWorld, mFView), mFProj);
+	hlsl::float4x4 mWorldViewProjF = mul(mul(mWorld, mFView), mFProj);
 
 	//update constant buffer
 	m_rCBObjectTransform->Map(pImmediateContext);
@@ -919,7 +908,7 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 
 	m_rCBObjectFaceAUs->Map(pImmediateContext);
 		CB_PER_OBJECT* pMappedDataF = (CB_PER_OBJECT*)m_rCBObjectFaceAUs->GetDataPtr();
-		pMappedDataF->mWorldViewProj = mWorldViewProj;
+		pMappedDataF->mWorldViewProj = mWorldViewProjF;
 	m_rCBObjectFaceAUs->Unmap(pImmediateContext);
 
 
@@ -939,21 +928,33 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	{
 		CD3D11RenderTexture2D* pTex = m_rRenderMesh->GetDiffuseTexture(iSubset);
 		ID3D11ShaderResourceView* ppSRVs[1] = { pTex != NULL ? pTex->AsSRV() : NULL };
-
 		pImmediateContext->PSSetShaderResources(0, 1, ppSRVs);
 		m_rRenderMesh->DrawSubset(iSubset, pImmediateContext);
 	}
 
 	m_rRenderMesh->EndDraw(pImmediateContext);
-
 	m_rContextManager->PopRenderTargets();
 
-//	pImmediateContext->IASetInputLayout(m_rMeshLayoutFace);
-
-	//m_rContextManager->PushRenderTargets(m_rColorTarget);
+	m_rContextManager->PushRenderTargets(m_rColorTarget);
+	//Set Vertex Buffer
+	UINT stride = sizeof(hlsl::float4);
+	UINT offset = 0;
+	pImmediateContext->IASetVertexBuffers(0,1,&m_vertexBuffer,&stride, &offset);
+	
+	//Set Index Buffer
+	pImmediateContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R16_UINT, 0);
+	pImmediateContext->IASetInputLayout(m_rMeshLayoutFace);
 
 	//render face
-	//m_rContextManager->SetConfig(m_rFacePass);
+	m_rContextManager->SetConfig(m_rFacePass);
+
+	pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+	ID3D11ShaderResourceView* pFacePosSRV = m_rAnimationData->AsSRV();
+	pImmediateContext->VSSetShaderResources(0,1, &pFacePosSRV);
+	pImmediateContext->Draw(113,0);
+
+
 	//pImmediateContext->IASetInputLayout(m_rMeshLayoutFace->GetLayout());
 	//m_rRenderMeshFace->BeginDraw(pImmediateContext);
 	//for(UINT iSubset = 0; iSubset < m_rRenderMeshFace->GetNumSubsets(); iSubset++)
@@ -974,7 +975,7 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	//m_rRenderMeshFace->EndDraw(pImmediateContext);
 
 
-	//m_rContextManager->PopRenderTargets();
+	m_rContextManager->PopRenderTargets();
 	//
 	
 	//render full screen quad
