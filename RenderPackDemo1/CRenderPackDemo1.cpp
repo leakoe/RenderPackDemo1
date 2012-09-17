@@ -353,18 +353,13 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 		);
 
 	//create input layouts
-	D3D11_INPUT_ELEMENT_DESC layout[] = {{"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0}};
-	UINT numElements = ARRAYSIZE(layout);
 
-	/*if( FAILED(pDevice->CreateInputLayout(layout, numElements, rVSTexturedF, sizeof(m_vertexBuffer), &m_rMeshLayoutFace)))
-		return FALSE;*/
-
+	//((CD3D11VertexShaderRef)rVSTexturedF)->CreateInputLayout(layout, numElements, &m_rMeshLayoutFace);
 		
 
 	m_rMeshLayout = new CD3D11InputLayout(m_rRenderMesh->GetRenderGeometry(), rVSTextured);
 	//m_rMeshLayoutFace = new CD3D11InputLayout(m_rRenderMeshFace->GetRenderGeometry(), rVSTexturedF);
-	
-
+		
 	//always call this in the last line! (this will setup the magic resource management behind the scenes)
 	V_RETURN_HR( CSimpleApp11::OnCreateDevice(pDevice) );
 
@@ -862,6 +857,15 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 {
 	CSimpleApp11::OnFrameRender(pDevice, pImmediateContext);
 	
+	D3D11_INPUT_ELEMENT_DESC layout[] = {{"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0}};
+	UINT numElements = ARRAYSIZE(layout);
+
+	if( FAILED(pDevice->CreateInputLayout(layout, numElements, m_rFacePass->GetVertexShader()->GetLastSnapshot(),113*3, &m_rMeshLayoutFace))) {
+		SYSLOG("CRPD1.OCD",1,"Failed to create input Layout");
+		//return FALSE;
+	}
+
+
 		//Set Vertex Buffer
 	UINT stride = sizeof(hlsl::float4);
 	UINT offset = 0;
