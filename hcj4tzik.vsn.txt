@@ -1,0 +1,42 @@
+buffer
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# Committer: unknown <lakoecke@MAXPAYNE.ibds.uni-karlsruhe.de>
+#
+# On branch master
+# Changes to be committed:
+#   (use "git reset HEAD <file>..." to unstage)
+#
+#	deleted:    CRenderPackDemo/.gitattributes
+#	deleted:    CRenderPackDemo/.gitignore
+#	modified:   Debug/RenderPackDemo1.exe
+#	modified:   Debug/RenderPackDemo1.ilk
+#	modified:   Debug/RenderPackDemo1.pdb
+#	deleted:    RenderPack/.gitattributes
+#	deleted:    RenderPack/.gitignore
+#	modified:   RenderPackDemo1.sdf
+#	modified:   RenderPackDemo1.suo
+#	modified:   RenderPackDemo1/CRenderPackDemo1.cpp
+#	modified:   RenderPackDemo1/CRenderPackDemo1.h
+#	modified:   RenderPackDemo1/Debug/CL.read.1.tlog
+#	modified:   RenderPackDemo1/Debug/CRenderPackDemo1.obj
+#	modified:   RenderPackDemo1/Debug/FTHelper.obj
+#	modified:   RenderPackDemo1/Debug/KinectSensor.obj
+#	modified:   RenderPackDemo1/Debug/RenderPackDemo1.log
+#	modified:   RenderPackDemo1/Debug/Visualize.obj
+#	modified:   RenderPackDemo1/Debug/main.obj
+#	modified:   RenderPackDemo1/Debug/stdafx.obj
+#	modified:   RenderPackDemo1/Debug/vc100.idb
+#	modified:   RenderPackDemo1/Debug/vc100.pdb
+#	modified:   RenderPackDemo1/RenderPackDemo1.vcxproj
+#	modified:   RenderPackDemo1/RenderPackDemo1.vcxproj.filters
+#	modified:   RenderPackDemo1/Resources/Shaders/VS_TexturedF.hlsl
+#	modified:   RenderPackDemo1/stdafx.h
+#	modified:   ipch/renderpackdemo1-131e4852/renderpackdemo1-4c044481.ipch
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#	RenderPackDemo1.opensdf
+
