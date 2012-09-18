@@ -161,7 +161,7 @@ bool CRenderPackDemo1::Init()
 	x0 = -x1;
 	// control the camera
 	m_rFreeFlight = new CFreeFlightController();	
-	m_rFreeFlight->SetControlTarget(m_rFaceCam);
+	m_rFreeFlight->SetControlTarget(m_rCam);
 	m_rFreeFlight->SetInvertMouse(true);
 	AddAnimatable(m_rFreeFlight);
 	AddMessageHandler(m_rFreeFlight);
@@ -180,8 +180,6 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 {
 	HRESULT hr;
 
-	
-	
 	//create renderable geometry
 	CD3D11MeshFactoryRef rFactory = new CD3D11MeshFactory(pDevice);
 	m_rRenderFullQuad = rFactory->CreateFullScreenQuad();
@@ -206,14 +204,12 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	//UINT channelSizesF[1] = {12};
 	UINT channelSizes[3] = {12, 12, 8}; //float3, float3, float2
 	m_rRenderMesh = rFactory->CreateRenderMesh(m_rMeshResource, channelNames, channelSizes, 3, m_rResManager);
-//	m_rRenderMeshFace = rFactory->CreateRenderMesh(m_rMeshResourceFace,channelNamesF, channelSizesF, 1, m_rResManager);
 	//we don't need the data on the CPU anymore
 	m_rMeshResource->GetTriMesh()->ReleaseGeometryData();
 
 
 	unsigned int nVerts = numOfFaceVerts;// m_rMeshResourceFace->GetTriMesh()->GetNumVertices();
-	//unsigned int nAUs = 7;
-	
+
 	//vertexbuffer
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd,sizeof(bd));
@@ -228,9 +224,6 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	if(FAILED(pDevice->CreateBuffer(&bd, &InitDataV, &m_vertexBuffer)))
 		return false;
 
-	
-	SYSLOG("CRPD1.OCD",1,"createbuffer vertex");
-
 	//indexbuffer
 	D3D11_BUFFER_DESC bdi;
 	ZeroMemory(&bdi,sizeof(bdi));
@@ -244,8 +237,7 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	InitDataI.pSysMem = &m_faceIndices;
 	if(FAILED(pDevice->CreateBuffer(&bdi, &InitDataI, &m_indexBuffer)))
 		return false;
-	SYSLOG("CRPD1.OCD",1,"createbuffer index");
-
+	
 	// TO DO: fill up the init data
 	
 	ParseDataInput();
@@ -330,9 +322,6 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	rPSTextured->BindSampler(0, rSamLinear);
 
 	VertexShaderResourceRef rVSTexturedF = UseVSResource(L"VSTexturedF", pDevice, L"Resources\\Shaders\\VS_TexturedF.hlsl", "VSMain");
-	
-	
-
 	rVSTexturedF->BindConstantBuffer(0, m_rCBObjectFaceAUs);
 
 
@@ -460,7 +449,7 @@ void CRenderPackDemo1::ParseObjInput() {
 	buffer<<inFile.rdbuf();
 	inFile.close();
 
-	SYSLOG("CRPD1.POI",1,"start parsing");
+	
 
 	std::stringstream copyBuffer(buffer.str());
 	nVerts = 0;
@@ -476,26 +465,21 @@ void CRenderPackDemo1::ParseObjInput() {
 		if(0 == strcmp( strCommand, "#")) {
 			//comment
 		} else if (0 == strcmp( strCommand, "v")) {
-			SYSLOG("CRPD1.POI",1,"Count vert "<<nVerts);
+			
 			nVerts++;
 			
 		} else if (0 == strcmp(strCommand, "f")) {
-			SYSLOG("CRPD1.POI",1,"Count faces "<<nFaces);
+			
 			nFaces++;
 		}
 		copyBuffer.ignore( 1000, '\n');
 	} 
-	SYSLOG("CRPD1.POI",1,"Count faces2 "<<nFaces);
+
 	numOfFaceFaces = nFaces*3;
 	numOfFaceVerts = nVerts;
 
 	m_vertexData = new hlsl::float4[numOfFaceVerts];
 	m_faceIndices = new WORD[numOfFaceFaces];
-//***############
-//	(m_vertexData) = new hlsl::float4[nVerts]; // bestehen aus den xyz-Werten und dem Indize
-//	m_faceIndices[nFaces];
-
-//	(pAU_nVerts) = new hlsl::int1[nAUs];
 	
 	
 	int posIdx = 0;
@@ -509,7 +493,6 @@ void CRenderPackDemo1::ParseObjInput() {
 		if(!buffer)
 			break;
 
-		SYSLOG("CRPD1.POI",1,"strCommand "<<strCommand);
 		if(0 == strcmp( strCommand, "#")) {
 			//comment
 		} else if( 0 == strcmp( strCommand, "f")) {
@@ -518,16 +501,16 @@ void CRenderPackDemo1::ParseObjInput() {
 			(m_faceIndices[auIdx++]) = l;
 			(m_faceIndices[auIdx++]) = m;
 			(m_faceIndices[auIdx++]) = n;
-			SYSLOG("CRPD1.POI",1,"face von parseobjectinput "<<l<<" "<<m<<" "<<n);
+	//		SYSLOG("CRPD1.POI",1,"face von parseobjectinput "<<l<<" "<<m<<" "<<n);
 	
 		} else if (0 == strcmp( strCommand, "v"))  {
-			SYSLOG("CRPD1.POI",1,"v");
+		
 			float x,y,z;
 			buffer>>x>>y>>z;
-			SYSLOG("CRPD1.POI",1,"x "<<x<<" y "<<y<<" z "<<z<<" "<<posIdx);
+			//SYSLOG("CRPD1.POI",1,"x "<<x<<" y "<<y<<" z "<<z<<" "<<posIdx);
 			//idx = idx+1;
 			((m_vertexData)[posIdx]).xyzw = hlsl::float4(x,y,z,(posIdx));
-			SYSLOG("CRPD1.POI",1,"vertices von parseobjectinput "<<x<<" "<<y<<" "<<z<<" "<<posIdx);
+		//	SYSLOG("CRPD1.POI",1,"vertices von parseobjectinput "<<x<<" "<<y<<" "<<z<<" "<<posIdx);
 			posIdx++;
 			
 		} 
@@ -537,7 +520,7 @@ void CRenderPackDemo1::ParseObjInput() {
 		if(nextChar == ' ')
 			buffer.get();
 
-		SYSLOG("CRPD1.POI",1,"ende von parseobjectinput");
+		
 	
 }
 
@@ -562,8 +545,6 @@ void CRenderPackDemo1::ParseDataInput() {
 	buffer<<inFile.rdbuf();
 	inFile.close();
 
-	SYSLOG("CRPD1.PDI",1,"start parsing");
-
 	std::stringstream copyBuffer(buffer.str());
 	nAUs = 0;
 #pragma warning(disable: 4127)
@@ -576,7 +557,7 @@ void CRenderPackDemo1::ParseDataInput() {
 		//SYSLOG("CRPD1.PDI",1,"CommandStream "<<strCommand);
 		
 		if (0 == strcmp( strCommand, "n")) {
-			SYSLOG("CRPD1.PDI",1,"Count nAUs "<<nAUs);
+		//	SYSLOG("CRPD1.PDI",1,"Count nAUs "<<nAUs);
 			nAUs++;
 			int tmp_nVertsAU;
 			copyBuffer>>tmp_nVertsAU;
@@ -872,7 +853,7 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	m_rMeshResource->GetTriMesh()->GetWorldTransform(&mWorld);
 	mView = *m_rCam->GetViewMatrix();
 	mFView = *m_rFaceCam->GetViewMatrix();
-	hlsl::float4x4 scalerF = hlsl::scale<float,4,4>(hlsl::float3(1000.0,1000.0,1000.0));
+	hlsl::float4x4 scalerF = hlsl::scale<float,4,4>(hlsl::float3(1500.0,1500.0,1500.0));
 	hlsl::float4x4 scaler = hlsl::scale<float,4,4>(hlsl::float3(10.0,10.0,10.0));
 	hlsl::float4x4 translateMatrix = hlsl::translation<float,4,4>(translateOffset);
 	mFView = mul(scalerF, mFView);
@@ -948,11 +929,11 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	//render face
 	m_rContextManager->SetConfig(m_rFacePass);
 
-	pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-
+	pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_32_CONTROL_POINT_PATCHLIST);
+	
 	ID3D11ShaderResourceView* pFacePosSRV = m_rAnimationData->AsSRV();
 	pImmediateContext->VSSetShaderResources(0,1, &pFacePosSRV);
-	pImmediateContext->Draw(113,0);
+	pImmediateContext->Draw(numOfFaceVerts,0);//IndexedInstanced(numOfFaceFaces, numOfFaceFaces, 1,0,0);
 
 
 	//pImmediateContext->IASetInputLayout(m_rMeshLayoutFace->GetLayout());
