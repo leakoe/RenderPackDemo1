@@ -245,12 +245,12 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	SYSLOG("CRPD1.OCD!",1,"Parsedata 2 nVerts "<<nVerts<<" nAUs "<<nAUs);
 	hlsl::float3 *pAnimPositions = new hlsl::float3[nVerts * (nAUs+1)];
 	CD3D11StructuredDataBuffer::BUFFER_DESC bufDesc;
-	bufDesc.NumElements = nVerts * (nAUs+1);
+	bufDesc.NumElements = nVerts ;//* (nAUs+1)
 	bufDesc.StructureStride = 3 * sizeof(float);
 	//std::vector<hlsl::float4>& m_vertexData = m_rMeshResourceFace->GetTriMesh()->GetVertexData().GetChannels()["POSITION"].GetData();
 	
 	int tmpVertIdx = 0;
-	for(unsigned int iVert = 0; iVert < nVerts*(nAUs+1); iVert++)
+	for(unsigned int iVert = 0; iVert < nVerts; iVert++)
 	{
 		/*SYSLOG("CRPD1.OCD",1,"vertexData "<<vertexData[tmpVertIdx].xyz);*/
 		pAnimPositions[iVert] = m_vertexData[tmpVertIdx++].xyz;
@@ -593,7 +593,7 @@ void CRenderPackDemo1::ParseDataInput() {
 			buffer>>x>>y>>z;
 
 			//idx = idx+1;
-			((pAnimationUnits)[posIdx++]).xyzw = hlsl::float4(x,y,z,(idx));
+			((pAnimationUnits)[posIdx++]).xyzw = hlsl::float4(x,y,z,idx);
 
 		} 
 	}
@@ -842,9 +842,6 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 {
 	CSimpleApp11::OnFrameRender(pDevice, pImmediateContext);
 	
-
-
-
 	// render the scene from the camera
 	// update the matrices
 	//translateOffset = float3(0,0.0f,0);
@@ -929,11 +926,14 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	//render face
 	m_rContextManager->SetConfig(m_rFacePass);
 
-	pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_32_CONTROL_POINT_PATCHLIST);
+	pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	
+
 	
 	ID3D11ShaderResourceView* pFacePosSRV = m_rAnimationData->AsSRV();
+
 	pImmediateContext->VSSetShaderResources(0,1, &pFacePosSRV);
-	pImmediateContext->Draw(numOfFaceVerts,0);//IndexedInstanced(numOfFaceFaces, numOfFaceFaces, 1,0,0);
+	pImmediateContext->DrawIndexed(184,0 ,0);//IndexedInstanced(numOfFaceFaces, numOfFaceFaces, 1,0,0);
 
 
 	//pImmediateContext->IASetInputLayout(m_rMeshLayoutFace->GetLayout());
@@ -944,11 +944,9 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	//	ID3D11ShaderResourceView* ppSRVs[1] = { pTex != NULL ? pTex->AsSRV() : NULL };
 
 	//	ID3D11ShaderResourceView* pFacePosSRV = m_rAnimationData->AsSRV();
-
 	//	pImmediateContext->PSSetShaderResources(0, 1, ppSRVs);
 	//	pImmediateContext->VSSetShaderResources(0, 1, &pFacePosSRV);
 	//	m_rRenderMeshFace->DrawSubset(iSubset, pImmediateContext);
-
 	//	ppSRVs[0] = NULL;
 	//	pImmediateContext->VSSetShaderResources(0, 1, ppSRVs);
 	//}
