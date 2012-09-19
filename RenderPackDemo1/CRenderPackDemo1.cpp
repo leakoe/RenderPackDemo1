@@ -236,11 +236,6 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	ZeroMemory(&InitDataI, sizeof(InitDataI));
 	InitDataI.pSysMem = m_faceIndices;
 
-	for(int h = 0; h < numOfFaceFaces; h++) {
-		SYSLOG("CRPD1.OCD",1,"numOFFaceFcaes mit index "<<h<<" v "<<m_faceIndices[h]);
-	}
-
-
 	if(FAILED(pDevice->CreateBuffer(&bdi, &InitDataI, &m_indexBuffer)))
 		return false;
 	
@@ -266,27 +261,39 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 		}
 	}
 
-	for(int j = 0; j < nVerts; j++) {
-		SYSLOG("CRPD1.OCD",1,"pAnimPositions1 idx "<<j<<" v "<<pAnimPositions[j]);
+	int tmp_whatever = 0;
+	for( int i = 0; i < nAUs; i++) {
+		SYSLOG("CRPD1.OCD",1,"pAU_nVerts idx "<<i<<" v "<<pAU_nVerts[i].x);
+		tmp_whatever += pAU_nVerts[i].x;
+	}
+
+	for(int j = 0; j < tmp_whatever; j++) {
+		SYSLOG("CRPD1.OCD",1,"pAnimationUnits idx "<<j<<" x "<<pAnimationUnits[j].x<<" y "<<pAnimationUnits[j].y<<" z "<<pAnimationUnits[j].z<<" w "<<pAnimationUnits[j].w);
+	}
+
+	int tmp_nVertsAu = (pAU_nVerts[0]).x;
+	for(unsigned int j = 0; j < tmp_nVertsAu; j++) {
+		unsigned int tmp_idx = pAnimationUnits[j].w;
+		float weight = -1.f;
+		SYSLOG("CRPD1.OCD",1,"weight j "<<j<<" x "<<(pAnimationUnits[j]).x<<" y "<<(pAnimationUnits[j]).y<<" z "<<(pAnimationUnits[j]).z)
+		pAnimPositions[tmp_idx].x = pAnimPositions[tmp_idx].x + weight*(pAnimationUnits[j]).x;
+		pAnimPositions[tmp_idx].y = pAnimPositions[tmp_idx].y + weight*(pAnimationUnits[j]).y;
+		pAnimPositions[tmp_idx].z = pAnimPositions[tmp_idx].z + weight*(pAnimationUnits[j]).z;
 	}
 
 	//int allNVerts = 0;
-	//for(unsigned int i = 0; i < 1; i++) {//####nAUS
+	//for(unsigned int i = 0; i < nAUs; i++) {//####nAUS
 	//	int tmp_nVertsAU = ((pAU_nVerts)[i]).x;
 	//	//SYSLOG("CRPD1.OCD",1,"tmp_nVertsAU "<<tmp_nVertsAU);
 	//	for(unsigned int j = 0; j < tmp_nVertsAU; j++) {
 	//		int idx = allNVerts + j;
-	//		unsigned int tmp_idx = ((pAnimationUnits)[idx]).w;
-	//		//##unsigned int tmp_idx = nVerts*(i+1)+((pAnimationUnits)[idx]).w;
+	//		//unsigned int tmp_idx = ((pAnimationUnits)[idx]).w;
+	//		unsigned int tmp_idx = nVerts*(i+1)+((pAnimationUnits)[idx]).w;
 	//		//SYSLOG("CRPD1.OCD",1,"tmp_idx "<<tmp_idx);
 	//		pAnimPositions[tmp_idx] = (pAnimationUnits)[idx].xyz;
 	//	}
 	//	allNVerts = allNVerts + tmp_nVertsAU;
 	//}
-
-	for(int k = 0; k < nVerts; k++) {
-		SYSLOG("CRPD1.OCD",1,"pAnimPositions2 idx "<<k<<" v "<<pAnimPositions[k]);
-	}
 
 	m_rAnimationData = new CD3D11StructuredDataBuffer(bufDesc, pAnimPositions);
 	V_RETURN_HR(m_rAnimationData->CreateOnDevice(pDevice));
@@ -609,16 +616,12 @@ void CRenderPackDemo1::ParseDataInput() {
 
 			//idx = idx+1;
 			((pAnimationUnits)[posIdx++]).xyzw = hlsl::float4(x,y,z,idx);
-
 		} 
 	}
 
 		char nextChar = buffer.peek();
 		if(nextChar == ' ')
 			buffer.get();
-	
-	
-
 
 }
 
@@ -933,16 +936,16 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	UINT stride = sizeof(hlsl::float4);
 	UINT offset = 0;
 	pImmediateContext->IASetVertexBuffers(0,1,&m_vertexBuffer,&stride, &offset);
-	
-	if(!flag) {
-		SYSLOG("CRPD1.OFR",1,"numoffacefaces"<<numOfFaceFaces);
-	for(int i = 0; i < numOfFaceFaces; i++) {
-		//UINT temp2 = dynamic_cast<UINT*>((&m_indexBuffer)[i*sizeof(UINT)]);
-		int temp = m_faceIndices[i];
-		SYSLOG("CRPD1.OFR",1,"m_indexBuffer "<<i<<" idx "<<temp);
-	}
-	flag = true;
-	}
+	//
+	//if(!flag) {
+	//	SYSLOG("CRPD1.OFR",1,"numoffacefaces"<<numOfFaceFaces);
+	//for(int i = 0; i < numOfFaceFaces; i++) {
+	//	//UINT temp2 = dynamic_cast<UINT*>((&m_indexBuffer)[i*sizeof(UINT)]);
+	//	int temp = m_faceIndices[i];
+	//	SYSLOG("CRPD1.OFR",1,"m_indexBuffer "<<i<<" idx "<<temp);
+	//}
+	//flag = true;
+	//}
 	//Set Index Buffer
 	pImmediateContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 	pImmediateContext->IASetInputLayout(m_rMeshLayoutFace);
@@ -957,9 +960,7 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	ID3D11ShaderResourceView* pFacePosSRV = m_rAnimationData->AsSRV();
 
 	pImmediateContext->VSSetShaderResources(0,1, &pFacePosSRV);
-	UINT  test= 184*3;
-	pImmediateContext->DrawIndexed(test,0,1);//DrawIndexed(test, 0,0);//IndexedInstanced(numOfFaceFaces, numOfFaceFaces, 1,0,0);
-
+	pImmediateContext->DrawIndexed(numOfFaceFaces,0,1);
 
 	//pImmediateContext->IASetInputLayout(m_rMeshLayoutFace->GetLayout());
 	//m_rRenderMeshFace->BeginDraw(pImmediateContext);
