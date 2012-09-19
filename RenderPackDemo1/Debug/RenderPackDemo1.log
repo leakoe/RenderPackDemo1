@@ -1,4 +1,4 @@
-﻿Build started 18.09.2012 19:07:57.
+﻿Build started 19.09.2012 17:35:07.
      1>Project "C:\Users\lakoecke\Documents\Visual Studio 2010\Projects\RenderPackDemo1\RenderPackDemo1\RenderPackDemo1.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\RenderPackDemo1.unsuccessfulbuild" because "AlwaysCreate" was specified.
@@ -7,28 +7,27 @@
          CRenderPackDemo1.cpp
      1>CRenderPackDemo1.cpp(103): warning C4305: 'argument' : truncation from 'double' to 'float'
      1>CRenderPackDemo1.cpp(105): warning C4305: 'argument' : truncation from 'double' to 'float'
-     1>CRenderPackDemo1.cpp(263): warning C4018: '<' : signed/unsigned mismatch
-     1>CRenderPackDemo1.cpp(266): warning C4018: '<' : signed/unsigned mismatch
-     1>CRenderPackDemo1.cpp(269): warning C4244: 'initializing' : conversion from 'float' to 'unsigned int', possible loss of data
-     1>CRenderPackDemo1.cpp(512): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>CRenderPackDemo1.cpp(441): warning C4101: 'strMatFileName' : unreferenced local variable
-     1>CRenderPackDemo1.cpp(596): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>CRenderPackDemo1.cpp(530): warning C4101: 'tmp_amount' : unreferenced local variable
-     1>CRenderPackDemo1.cpp(537): warning C4101: 'strMatFileName' : unreferenced local variable
-     1>CRenderPackDemo1.cpp(666): warning C4244: 'initializing' : conversion from 'const UINT' to 'FLOAT', possible loss of data
-     1>CRenderPackDemo1.cpp(667): warning C4244: 'initializing' : conversion from 'const UINT' to 'FLOAT', possible loss of data
-     1>CRenderPackDemo1.cpp(816): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
-     1>CRenderPackDemo1.cpp(817): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
-     1>CRenderPackDemo1.cpp(819): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
-     1>CRenderPackDemo1.cpp(820): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>CRenderPackDemo1.cpp(269): warning C4018: '<' : signed/unsigned mismatch
+     1>CRenderPackDemo1.cpp(287): warning C4018: '<' : signed/unsigned mismatch
+     1>CRenderPackDemo1.cpp(527): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>CRenderPackDemo1.cpp(456): warning C4101: 'strMatFileName' : unreferenced local variable
+     1>CRenderPackDemo1.cpp(611): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>CRenderPackDemo1.cpp(545): warning C4101: 'tmp_amount' : unreferenced local variable
+     1>CRenderPackDemo1.cpp(552): warning C4101: 'strMatFileName' : unreferenced local variable
+     1>CRenderPackDemo1.cpp(681): warning C4244: 'initializing' : conversion from 'const UINT' to 'FLOAT', possible loss of data
+     1>CRenderPackDemo1.cpp(682): warning C4244: 'initializing' : conversion from 'const UINT' to 'FLOAT', possible loss of data
+     1>CRenderPackDemo1.cpp(831): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>CRenderPackDemo1.cpp(832): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>CRenderPackDemo1.cpp(834): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>CRenderPackDemo1.cpp(835): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
      1>c:\users\lakoecke\documents\visual studio 2010\projects\renderpackdemo1\renderpackdemo1\crenderpackdemo1.cpp(133): warning C6246: Local declaration of 'i' hides declaration of the same name in outer scope. For additional information, see previous declaration at line '74' of 'c:\users\lakoecke\documents\visual studio 2010\projects\renderpackdemo1\renderpackdemo1\crenderpackdemo1.cpp': Lines: 74
      1>c:\users\lakoecke\documents\visual studio 2010\projects\renderpackdemo1\renderpackdemo1\crenderpackdemo1.cpp(225): warning C6216: Compiler-inserted cast between semantically different integral types: a Boolean type to HRESULT
-     1>c:\users\lakoecke\documents\visual studio 2010\projects\renderpackdemo1\renderpackdemo1\crenderpackdemo1.cpp(239): warning C6216: Compiler-inserted cast between semantically different integral types: a Boolean type to HRESULT
-     1>c:\users\lakoecke\documents\visual studio 2010\projects\renderpackdemo1\renderpackdemo1\crenderpackdemo1.cpp(380): warning C6201: Index '6' is out of valid index range '0' to '5' for possibly stack allocated buffer 'm_TurnStatus'
-     1>c:\users\lakoecke\documents\visual studio 2010\projects\renderpackdemo1\renderpackdemo1\crenderpackdemo1.cpp(380): warning C6386: Buffer overrun: accessing 'm_TurnStatus', the writable size is '6' bytes, but '7' bytes might be written: Lines: 364, 365, 366, 367, 368, 369, 370, 371, 372, 373, 374, 375, 376, 377, 378, 379, 380
-     1>c:\users\lakoecke\documents\visual studio 2010\projects\renderpackdemo1\renderpackdemo1\crenderpackdemo1.cpp(628): warning C6011: Dereferencing NULL pointer 'pResult': Lines: 623, 624, 625, 626, 627, 628
-     1>c:\users\lakoecke\documents\visual studio 2010\projects\renderpackdemo1\renderpackdemo1\crenderpackdemo1.cpp(986): warning C6031: Return value ignored: 'GetKeyboardState'
-     1>c:\users\lakoecke\documents\visual studio 2010\projects\renderpackdemo1\renderpackdemo1\crenderpackdemo1.cpp(1034): warning C6031: Return value ignored: 'GetKeyboardState'
+     1>c:\users\lakoecke\documents\visual studio 2010\projects\renderpackdemo1\renderpackdemo1\crenderpackdemo1.cpp(245): warning C6216: Compiler-inserted cast between semantically different integral types: a Boolean type to HRESULT
+     1>c:\users\lakoecke\documents\visual studio 2010\projects\renderpackdemo1\renderpackdemo1\crenderpackdemo1.cpp(395): warning C6201: Index '6' is out of valid index range '0' to '5' for possibly stack allocated buffer 'm_TurnStatus'
+     1>c:\users\lakoecke\documents\visual studio 2010\projects\renderpackdemo1\renderpackdemo1\crenderpackdemo1.cpp(395): warning C6386: Buffer overrun: accessing 'm_TurnStatus', the writable size is '6' bytes, but '7' bytes might be written: Lines: 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 389, 390, 391, 392, 393, 394, 395
+     1>c:\users\lakoecke\documents\visual studio 2010\projects\renderpackdemo1\renderpackdemo1\crenderpackdemo1.cpp(643): warning C6011: Dereferencing NULL pointer 'pResult': Lines: 638, 639, 640, 641, 642, 643
+     1>c:\users\lakoecke\documents\visual studio 2010\projects\renderpackdemo1\renderpackdemo1\crenderpackdemo1.cpp(1011): warning C6031: Return value ignored: 'GetKeyboardState'
+     1>c:\users\lakoecke\documents\visual studio 2010\projects\renderpackdemo1\renderpackdemo1\crenderpackdemo1.cpp(1059): warning C6031: Return value ignored: 'GetKeyboardState'
        ResourceCompile:
          All outputs are up-to-date.
        ManifestResourceCompile:
@@ -62,8 +61,8 @@
          :VCEnd
          C:\lokal\fnsimon\RenderFramework\Debug\RenderPack.dll
          1 Datei(en) kopiert
-         Datei DirectPack.dll nicht gefunden
          0 Datei(en) kopiert
+         Datei DirectPack.dll nicht gefunden
          C:\lokal\fnsimon\RenderFramework\External\bin\x86\DevIL.dll
          1 Datei(en) kopiert
          C:\lokal\fnsimon\RenderFramework\External\bin\x86\ILU.dll
@@ -77,4 +76,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:07.25
+Time Elapsed 00:00:08.69

@@ -13,7 +13,6 @@
 #include "Render\D3D11\Shaders\CD3D11InputLayout.h"
 #include "Render\D3D11\Util\CD3D11MeshFactory.h"
 #include "Loaders\CObjLoader.h"
-#include "Loaders\CSimpleLoader.h"
 #include "SceneModel\CCamera.h"
 #include "SceneModel\Animation\CFreeFlightController.h"
 #include "CCameraController.h"
@@ -152,7 +151,9 @@ protected:
 	//index Buffer for the FaceMesh
 	int numOfFaceFaces;
 	ID3D11Buffer* m_indexBuffer;
-	WORD *m_faceIndices;
+	int *m_faceIndices;
+
+	bool flag;
 
 	
 	//constant buffers

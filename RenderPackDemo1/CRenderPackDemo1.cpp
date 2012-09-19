@@ -54,12 +54,12 @@ bool CRenderPackDemo1::Init()
 		return false;
 
 
-	
+	flag = false;
 
 	isTracked = false;
 	//load scene from OBJ file.	
 	CObjLoaderRef rObjLoader = new CObjLoader();
-	CSimpleLoaderRef rSimpleLoader;
+//	CSimpleLoaderRef rSimpleLoader;
 	
 	rObjLoader->SetLogWriter(GetLogWriter());
 
@@ -220,7 +220,7 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	bd.MiscFlags = 0;
 	D3D11_SUBRESOURCE_DATA InitDataV;
 	ZeroMemory(&InitDataV, sizeof(InitDataV));
-	InitDataV.pSysMem = &m_vertexData;
+	InitDataV.pSysMem = m_vertexData;
 	if(FAILED(pDevice->CreateBuffer(&bd, &InitDataV, &m_vertexBuffer)))
 		return false;
 
@@ -228,13 +228,19 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	D3D11_BUFFER_DESC bdi;
 	ZeroMemory(&bdi,sizeof(bdi));
 	bdi.Usage = D3D11_USAGE_DEFAULT;
-	bdi.ByteWidth = sizeof(WORD)*numOfFaceFaces;
+	bdi.ByteWidth = sizeof(int)*numOfFaceFaces;
 	bdi.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	bdi.CPUAccessFlags = 0;
 	bdi.MiscFlags = 0;
 	D3D11_SUBRESOURCE_DATA InitDataI;
-	ZeroMemory(&InitDataV, sizeof(InitDataI));
-	InitDataI.pSysMem = &m_faceIndices;
+	ZeroMemory(&InitDataI, sizeof(InitDataI));
+	InitDataI.pSysMem = m_faceIndices;
+
+	for(int h = 0; h < numOfFaceFaces; h++) {
+		SYSLOG("CRPD1.OCD",1,"numOFFaceFcaes mit index "<<h<<" v "<<m_faceIndices[h]);
+	}
+
+
 	if(FAILED(pDevice->CreateBuffer(&bdi, &InitDataI, &m_indexBuffer)))
 		return false;
 	
@@ -243,7 +249,7 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	ParseDataInput();
 
 	SYSLOG("CRPD1.OCD!",1,"Parsedata 2 nVerts "<<nVerts<<" nAUs "<<nAUs);
-	hlsl::float3 *pAnimPositions = new hlsl::float3[nVerts * (nAUs+1)];
+	hlsl::float3 *pAnimPositions = new hlsl::float3[nVerts];//* (nAUs+1)s
 	CD3D11StructuredDataBuffer::BUFFER_DESC bufDesc;
 	bufDesc.NumElements = nVerts ;//* (nAUs+1)
 	bufDesc.StructureStride = 3 * sizeof(float);
@@ -254,23 +260,32 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	{
 		/*SYSLOG("CRPD1.OCD",1,"vertexData "<<vertexData[tmpVertIdx].xyz);*/
 		pAnimPositions[iVert] = m_vertexData[tmpVertIdx++].xyz;
+		
 		if(tmpVertIdx == nVerts ) {
 			tmpVertIdx = 0;
 		}
 	}
 
-	int allNVerts = 0;
-	for(unsigned int i = 0; i < nAUs; i++) {
-		int tmp_nVertsAU = ((pAU_nVerts)[i]).x;
-		//SYSLOG("CRPD1.OCD",1,"tmp_nVertsAU "<<tmp_nVertsAU);
-		for(unsigned int j = 0; j < tmp_nVertsAU; j++) {
-			int idx = allNVerts + j;
-			//SYSLOG("CRPD1.OCD",1," tmp_nVertsAU "<<tmp_nVertsAU<<" nVerts "<<nVerts<<" i "<<i<<" (&pAnimationUnits)[j].w "<<(pAnimationUnits)[idx].w);
-			unsigned int tmp_idx = nVerts*(i+1)+((pAnimationUnits)[idx]).w;
-			//SYSLOG("CRPD1.OCD",1,"tmp_idx "<<tmp_idx);
-			pAnimPositions[tmp_idx] = (pAnimationUnits)[idx].xyz;
-		}
-		allNVerts = allNVerts + tmp_nVertsAU;
+	for(int j = 0; j < nVerts; j++) {
+		SYSLOG("CRPD1.OCD",1,"pAnimPositions1 idx "<<j<<" v "<<pAnimPositions[j]);
+	}
+
+	//int allNVerts = 0;
+	//for(unsigned int i = 0; i < 1; i++) {//####nAUS
+	//	int tmp_nVertsAU = ((pAU_nVerts)[i]).x;
+	//	//SYSLOG("CRPD1.OCD",1,"tmp_nVertsAU "<<tmp_nVertsAU);
+	//	for(unsigned int j = 0; j < tmp_nVertsAU; j++) {
+	//		int idx = allNVerts + j;
+	//		unsigned int tmp_idx = ((pAnimationUnits)[idx]).w;
+	//		//##unsigned int tmp_idx = nVerts*(i+1)+((pAnimationUnits)[idx]).w;
+	//		//SYSLOG("CRPD1.OCD",1,"tmp_idx "<<tmp_idx);
+	//		pAnimPositions[tmp_idx] = (pAnimationUnits)[idx].xyz;
+	//	}
+	//	allNVerts = allNVerts + tmp_nVertsAU;
+	//}
+
+	for(int k = 0; k < nVerts; k++) {
+		SYSLOG("CRPD1.OCD",1,"pAnimPositions2 idx "<<k<<" v "<<pAnimPositions[k]);
 	}
 
 	m_rAnimationData = new CD3D11StructuredDataBuffer(bufDesc, pAnimPositions);
@@ -432,7 +447,7 @@ void CRenderPackDemo1::FacetrackingTranslations(FLOAT translationXYZ[3]) {
 }
 
 void CRenderPackDemo1::ParseObjInput() {
-	std::wstring path = L"Resources\\candide1.obj";
+	std::wstring path = L"Resources\\candide3.obj";
 	hlsl::float3 tmp_Position;
 	int nVerts = 0;
 	int nFaces = 0;
@@ -464,7 +479,7 @@ void CRenderPackDemo1::ParseObjInput() {
 		
 		if(0 == strcmp( strCommand, "#")) {
 			//comment
-		} else if (0 == strcmp( strCommand, "v")) {
+		} else if (0 == strcmp( strCommand, "vn")) {
 			
 			nVerts++;
 			
@@ -479,7 +494,7 @@ void CRenderPackDemo1::ParseObjInput() {
 	numOfFaceVerts = nVerts;
 
 	m_vertexData = new hlsl::float4[numOfFaceVerts];
-	m_faceIndices = new WORD[numOfFaceFaces];
+	m_faceIndices = new int[numOfFaceFaces];
 	
 	
 	int posIdx = 0;
@@ -503,7 +518,7 @@ void CRenderPackDemo1::ParseObjInput() {
 			(m_faceIndices[auIdx++]) = n;
 	//		SYSLOG("CRPD1.POI",1,"face von parseobjectinput "<<l<<" "<<m<<" "<<n);
 	
-		} else if (0 == strcmp( strCommand, "v"))  {
+		} else if (0 == strcmp( strCommand, "vn"))  {
 		
 			float x,y,z;
 			buffer>>x>>y>>z;
@@ -919,8 +934,17 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	UINT offset = 0;
 	pImmediateContext->IASetVertexBuffers(0,1,&m_vertexBuffer,&stride, &offset);
 	
+	if(!flag) {
+		SYSLOG("CRPD1.OFR",1,"numoffacefaces"<<numOfFaceFaces);
+	for(int i = 0; i < numOfFaceFaces; i++) {
+		//UINT temp2 = dynamic_cast<UINT*>((&m_indexBuffer)[i*sizeof(UINT)]);
+		int temp = m_faceIndices[i];
+		SYSLOG("CRPD1.OFR",1,"m_indexBuffer "<<i<<" idx "<<temp);
+	}
+	flag = true;
+	}
 	//Set Index Buffer
-	pImmediateContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R16_UINT, 0);
+	pImmediateContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 	pImmediateContext->IASetInputLayout(m_rMeshLayoutFace);
 
 	//render face
@@ -933,7 +957,8 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	ID3D11ShaderResourceView* pFacePosSRV = m_rAnimationData->AsSRV();
 
 	pImmediateContext->VSSetShaderResources(0,1, &pFacePosSRV);
-	pImmediateContext->DrawIndexed(184,0 ,0);//IndexedInstanced(numOfFaceFaces, numOfFaceFaces, 1,0,0);
+	UINT  test= 184*3;
+	pImmediateContext->DrawIndexed(test,0,1);//DrawIndexed(test, 0,0);//IndexedInstanced(numOfFaceFaces, numOfFaceFaces, 1,0,0);
 
 
 	//pImmediateContext->IASetInputLayout(m_rMeshLayoutFace->GetLayout());
