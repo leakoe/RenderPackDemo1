@@ -93,6 +93,7 @@ protected:
 
 	hlsl::float4 *pAnimationUnits;
 	hlsl::int1 * pAU_nVerts;
+	float * pAU_weights;
 	int nAUs;
 
 
@@ -148,6 +149,7 @@ protected:
 	ID3D11Buffer* m_vertexBuffer;
 
 	int numOfFaceVerts;
+	int numOfAllVertsAU;
 	//index Buffer for the FaceMesh
 	int numOfFaceFaces;
 	ID3D11Buffer* m_indexBuffer;
@@ -159,6 +161,7 @@ protected:
 	//constant buffers
 	CD3D11ConstantBufferRef m_rCBObjectTransform;
 	CD3D11ConstantBufferRef m_rCBObjectFaceAUs;
+	CD3D11ConstantBufferRef m_rCBAUs;
 
 	CD3D11StructuredDataBufferRef	m_rAnimationData;
 
