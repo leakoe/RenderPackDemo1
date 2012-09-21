@@ -40,13 +40,14 @@
 	};
 */
 struct CB_PER_AU {
-	hlsl::float4 *g_pAnimationUnits;
-	hlsl::int1 * g_pAU_nVerts;
-	float *g_pAU_Weights;
-	int g_nAUs;
-	int g_nAllVerts;
+	
+	//hlsl::int1 g_pAU_nVerts[6];
+	float g_pAU_Weights[6];
 };
 
+struct CB_PER_AU1 {
+	hlsl::float4 g_pAnimationUnits[678];
+};
 
 
 //float CRenderPackDemo1::m_MonitorHeight = 0;
@@ -349,6 +350,10 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	m_rCBAUs->SetDebugName("CB_PER_AU");
 	V_RETURN_HR(m_rCBAUs->CreateOnDevice(pDevice));
 
+	m_rCBAU1s = new CD3D11ConstantBuffer(sizeof(CB_PER_AU1));
+	m_rCBAU1s->SetDebugName("CB_PER_AU1");
+	V_RETURN_HR(m_rCBAU1s->CreateOnDevice(pDevice));
+
 	//samplers
 	CD3D11SamplerStateRef rSamPoint = CD3D11SamplerState::CreatePredefined(CD3D11SamplerState::POINT_CLAMP);
 	V_RETURN_HR(rSamPoint->CreateOnDevice(pDevice));
@@ -366,6 +371,7 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	VertexShaderResourceRef rVSTexturedF = UseVSResource(L"VSTexturedF", pDevice, L"Resources\\Shaders\\VS_TexturedF.hlsl", "VSMain");
 	rVSTexturedF->BindConstantBuffer(0, m_rCBObjectFaceAUs);
 	rVSTexturedF->BindConstantBuffer(4, m_rCBAUs);
+	rVSTexturedF->BindConstantBuffer(5, m_rCBAU1s);
 
 	m_rTexturedPass = new CD3D11RenderConfig(
 		rVSTextured,
@@ -419,6 +425,7 @@ void CRenderPackDemo1::OnDestroyDevice()
 	m_ftfrustum = NULL;
 	m_rCBObjectFaceAUs = NULL;
 	m_rCBAUs = NULL;
+	m_rCBAU1s = NULL;
 	m_rMeshLayoutFace = NULL;
 	m_rMeshResourceFace = NULL;
 	m_rRenderMeshFace = NULL;
@@ -614,7 +621,7 @@ void CRenderPackDemo1::ParseDataInput() {
 	(pAnimationUnits) = new hlsl::float4[nAUs*numOfFaceVerts]; // bestehen aus den xyz-Werten und dem Indize
 	(pAU_nVerts) = new hlsl::int1[nAUs];
 	(pAU_weights) = new float[nAUs];
-
+	pAnimationUnits[0] = float4(0.1f,0.1f,0.1f,1.0f);
 	for (int j = 0; j < nAUs*numOfFaceVerts; j++) {
 		pAnimationUnits[j] = float4(0,0,0,1.0f);
 	}
@@ -945,13 +952,28 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 
 	m_rCBAUs->Map(pImmediateContext);	
 	CB_PER_AU* pMappedDataFaceAUs = (CB_PER_AU*)m_rCBAUs->GetDataPtr();
-	pMappedDataFaceAUs->g_nAUs = nAUs;
-	pMappedDataFaceAUs->g_nAllVerts = numOfAllVertsAU;
-	pMappedDataFaceAUs->g_pAnimationUnits = pAnimationUnits;
-	pMappedDataFaceAUs->g_pAU_nVerts = pAU_nVerts;
-	pMappedDataFaceAUs->g_pAU_Weights = pAU_weights;
+//	pMappedDataFaceAUs->g_pAU_nVerts = pAU_nVerts;
+
+	for( int auidx = 0; auidx < nAUs; auidx++) {
+		
+		pMappedDataFaceAUs->g_pAU_Weights[auidx] = pAU_weights[auidx];
+		//SYSLOG("CRPD1.OFR",1,"testweight idx "<<auidx<<" v "<<pMappedDataFaceAUs->g_pAU_Weights[auidx]);
+	}
 	m_rCBAUs->Unmap(pImmediateContext);
 
+	m_rCBAU1s->Map(pImmediateContext);	
+	CB_PER_AU1* pMappedDataFaceAU1s = (CB_PER_AU1*)m_rCBAU1s->GetDataPtr();
+//	hlsl::float4 test[678];//  = {(*pAnimationUnits)};
+	//if(!flag) {
+	for (int g = 0; g < 6; g++) {
+	for( int k = 0; k < 113; k++) {
+	//	test[k] = pAnimationUnits[k];
+		pMappedDataFaceAU1s->g_pAnimationUnits[k] = pAnimationUnits[565+k];
+		//SYSLOG("CRPD1.OFR",1,"test idx "<<k<<" v "<<pMappedDataFaceAU1s->g_pAnimationUnits[k]);
+		}
+	}
+	//pMappedDataFaceAU1s->g_pAnimationUnits = (test);
+	m_rCBAU1s->Unmap(pImmediateContext);
 
 	m_rContextManager->PushRenderTargets(m_rColorTarget);
 	float tester = 6.5f;
@@ -1047,6 +1069,14 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	pSRVs[0] = NULL;
 	//pSRVs[1] = NULL;
 	pImmediateContext->PSSetShaderResources(0, 1, pSRVs);
+
+	if(!flag) {
+		for(int i = 0; i < 6*113; i++) {
+			//CB_PER_AU1 *pTest = (CB_PER_AU1*)m_rCBAU1s->GetDataPtr();
+			SYSLOG("CRPD1.OFR",1,"Constantbuffer mit Animation Units? idx "<<i<<" v "<<pMappedDataFaceAU1s->g_pAnimationUnits[i]);
+		}
+		flag = true;
+	}
 
 	FinishFrame();
 }

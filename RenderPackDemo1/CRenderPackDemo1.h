@@ -162,6 +162,7 @@ protected:
 	CD3D11ConstantBufferRef m_rCBObjectTransform;
 	CD3D11ConstantBufferRef m_rCBObjectFaceAUs;
 	CD3D11ConstantBufferRef m_rCBAUs;
+	CD3D11ConstantBufferRef m_rCBAU1s;
 
 	CD3D11StructuredDataBufferRef	m_rAnimationData;
 
