@@ -40,13 +40,12 @@
 	};
 */
 struct CB_PER_AU {
-	
-	//hlsl::int1 g_pAU_nVerts[6];
-	float g_pAU_Weights[6];
+	hlsl::float1 g_pAU_Weights[6];
 };
 
 struct CB_PER_AU1 {
-	hlsl::float4 g_pAnimationUnits[678];
+	hlsl::float4 g_pAnimationUnits[668];
+	//float g_pAU_Weights[6];
 };
 
 
@@ -346,7 +345,7 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	m_rCBObjectFaceAUs->SetDebugName("CB_PER_OBJECT");
 	V_RETURN_HR(m_rCBObjectFaceAUs->CreateOnDevice(pDevice));
 
-	m_rCBAUs = new CD3D11ConstantBuffer(sizeof(CB_PER_AU));
+	m_rCBAUs = new CD3D11ConstantBuffer(sizeof(float1)*6);
 	m_rCBAUs->SetDebugName("CB_PER_AU");
 	V_RETURN_HR(m_rCBAUs->CreateOnDevice(pDevice));
 
@@ -370,7 +369,7 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 
 	VertexShaderResourceRef rVSTexturedF = UseVSResource(L"VSTexturedF", pDevice, L"Resources\\Shaders\\VS_TexturedF.hlsl", "VSMain");
 	rVSTexturedF->BindConstantBuffer(0, m_rCBObjectFaceAUs);
-	rVSTexturedF->BindConstantBuffer(4, m_rCBAUs);
+	rVSTexturedF->BindConstantBuffer(6, m_rCBAUs);
 	rVSTexturedF->BindConstantBuffer(5, m_rCBAU1s);
 
 	m_rTexturedPass = new CD3D11RenderConfig(
@@ -620,7 +619,7 @@ void CRenderPackDemo1::ParseDataInput() {
 	numOfAllVertsAU = nVertsAU;
 	(pAnimationUnits) = new hlsl::float4[nAUs*numOfFaceVerts]; // bestehen aus den xyz-Werten und dem Indize
 	(pAU_nVerts) = new hlsl::int1[nAUs];
-	(pAU_weights) = new float[nAUs];
+	(pAU_weights) = new FLOAT[nAUs];
 	pAnimationUnits[0] = float4(0.1f,0.1f,0.1f,1.0f);
 	for (int j = 0; j < nAUs*numOfFaceVerts; j++) {
 		pAnimationUnits[j] = float4(0,0,0,1.0f);
@@ -953,25 +952,41 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	m_rCBAUs->Map(pImmediateContext);	
 	CB_PER_AU* pMappedDataFaceAUs = (CB_PER_AU*)m_rCBAUs->GetDataPtr();
 //	pMappedDataFaceAUs->g_pAU_nVerts = pAU_nVerts;
-
-	for( int auidx = 0; auidx < nAUs; auidx++) {
+	for( int auidx = 0; auidx < 6; auidx++) {
 		
 		pMappedDataFaceAUs->g_pAU_Weights[auidx] = pAU_weights[auidx];
 		//SYSLOG("CRPD1.OFR",1,"testweight idx "<<auidx<<" v "<<pMappedDataFaceAUs->g_pAU_Weights[auidx]);
 	}
+	/*pMappedDataFaceAUs->g_pAU_Weights[6] = 0.2704f;
+	pMappedDataFaceAUs->g_pAU_Weights[7] = 0.274f; 
+	*/
 	m_rCBAUs->Unmap(pImmediateContext);
 
 	m_rCBAU1s->Map(pImmediateContext);	
 	CB_PER_AU1* pMappedDataFaceAU1s = (CB_PER_AU1*)m_rCBAU1s->GetDataPtr();
 //	hlsl::float4 test[678];//  = {(*pAnimationUnits)};
 	//if(!flag) {
-	for (int g = 0; g < 6; g++) {
-	for( int k = 0; k < 113; k++) {
+	
+	//for (int g = 0; g < 6; g++) {
+		for( int k = 0; k < 668; k++) {
 	//	test[k] = pAnimationUnits[k];
-		pMappedDataFaceAU1s->g_pAnimationUnits[k] = pAnimationUnits[565+k];
+		//	if(g == 0) {
+				pMappedDataFaceAU1s->g_pAnimationUnits[k] = pAnimationUnits[k];
+		/*	} else if (g == 1) {
+				pMappedDataFaceAU1s->g_pAnimationUnits2[k] = pAnimationUnits[113+k];
+			} else if (g == 2) {
+				pMappedDataFaceAU1s->g_pAnimationUnits3[k] = pAnimationUnits[g*113+k];
+			} else if (g == 3) {
+				pMappedDataFaceAU1s->g_pAnimationUnits4[k] = pAnimationUnits[g*113+k];
+			} else if (g == 4) {
+				pMappedDataFaceAU1s->g_pAnimationUnits5[k] = pAnimationUnits[g*113+k];
+			} else if (g == 5) {
+				pMappedDataFaceAU1s->g_pAnimationUnits6[k] = pAnimationUnits[g*113+k];
+			}*/
+		
 		//SYSLOG("CRPD1.OFR",1,"test idx "<<k<<" v "<<pMappedDataFaceAU1s->g_pAnimationUnits[k]);
 		}
-	}
+//	}
 	//pMappedDataFaceAU1s->g_pAnimationUnits = (test);
 	m_rCBAU1s->Unmap(pImmediateContext);
 
@@ -1070,13 +1085,13 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	//pSRVs[1] = NULL;
 	pImmediateContext->PSSetShaderResources(0, 1, pSRVs);
 
-	if(!flag) {
-		for(int i = 0; i < 6*113; i++) {
-			//CB_PER_AU1 *pTest = (CB_PER_AU1*)m_rCBAU1s->GetDataPtr();
-			SYSLOG("CRPD1.OFR",1,"Constantbuffer mit Animation Units? idx "<<i<<" v "<<pMappedDataFaceAU1s->g_pAnimationUnits[i]);
-		}
-		flag = true;
-	}
+	//if(!flag) {
+	//	for(int i = 0; i < 6*113; i++) {
+	//		//CB_PER_AU1 *pTest = (CB_PER_AU1*)m_rCBAU1s->GetDataPtr();
+	//		SYSLOG("CRPD1.OFR",1,"Constantbuffer mit Animation Units? idx "<<i<<" v "<<pMappedDataFaceAU1s->g_pAnimationUnits[i]);
+	//	}
+	//	flag = true;
+	//}
 
 	FinishFrame();
 }
