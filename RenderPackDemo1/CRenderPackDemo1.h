@@ -74,7 +74,7 @@ public:
 
 	void FacetrackingTranslations(FLOAT translationXYZ[3]);
 
-	void FacetrackingAnimating(FLOAT *pCoefficients, unsigned int AUCount);
+	void FacetrackingAnimating(FLOAT *pCoefficients, unsigned int AUCount, FLOAT scale, FLOAT rotationXYZ[3],FLOAT translationXYZ[3]);
 
 protected:
 
@@ -127,6 +127,8 @@ protected:
 
 	float3 m_currFTTranslationsXYZ;
 
+	float3 m_rFaceRotation;
+
 	HWND m_hWnd;
 
 	//scene Model
@@ -162,7 +164,7 @@ protected:
 	CD3D11ConstantBufferRef m_rCBObjectTransform;
 	CD3D11ConstantBufferRef m_rCBObjectFaceAUs;
 	CD3D11ConstantBufferRef m_rCBAUs;
-	CD3D11ConstantBufferRef m_rCBAU1s;
+	CD3D11StructuredDataBufferRef m_rCBAU1s;
 
 	CD3D11StructuredDataBufferRef	m_rAnimationData;
 

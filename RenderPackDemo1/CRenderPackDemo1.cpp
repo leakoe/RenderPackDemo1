@@ -40,7 +40,7 @@
 	};
 */
 struct CB_PER_AU {
-	hlsl::float1 g_pAU_Weights[6];
+	float g_pAU_Weights[6];
 };
 
 struct CB_PER_AU1 {
@@ -223,6 +223,7 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	//we don't need the data on the CPU anymore
 	m_rMeshResource->GetTriMesh()->ReleaseGeometryData();
 
+	m_rFaceRotation =  float3(0,0,0);
 
 	unsigned int nVerts = numOfFaceVerts;// m_rMeshResourceFace->GetTriMesh()->GetNumVertices();
 
@@ -259,34 +260,25 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	
 	ParseDataInput();
 
+	CD3D11StructuredDataBuffer::BUFFER_DESC bufDescAU;
+	bufDescAU.NumElements = nVerts*nAUs ;//* (nAUs+1)
+	bufDescAU.StructureStride = 4 * sizeof(float);
+	m_rCBAU1s = new CD3D11StructuredDataBuffer(bufDescAU, pAnimationUnits);
+	m_rCBAU1s->SetDebugName("SDB_PER_AU1");
+	V_RETURN_HR(m_rCBAU1s->CreateOnDevice(pDevice));
+
 	SYSLOG("CRPD1.OCD!",1,"Parsedata 2 nVerts "<<nVerts<<" nAUs "<<nAUs);
 	hlsl::float3 *pAnimPositions = new hlsl::float3[nVerts];//* (nAUs+1)s
 	CD3D11StructuredDataBuffer::BUFFER_DESC bufDesc;
 	bufDesc.NumElements = nVerts ;//* (nAUs+1)
 	bufDesc.StructureStride = 3 * sizeof(float);
-	//std::vector<hlsl::float4>& m_vertexData = m_rMeshResourceFace->GetTriMesh()->GetVertexData().GetChannels()["POSITION"].GetData();
-	
+
 	int tmpVertIdx = 0;
-	for(unsigned int iVert = 0; iVert < nVerts; iVert++)
-	{
-		/*SYSLOG("CRPD1.OCD",1,"vertexData "<<vertexData[tmpVertIdx].xyz);*/
+	for(unsigned int iVert = 0; iVert < nVerts; iVert++) {
 		pAnimPositions[iVert] = m_vertexData[tmpVertIdx++].xyz;
-		
-		if(tmpVertIdx == nVerts ) {
+		if(tmpVertIdx == nVerts ) 
 			tmpVertIdx = 0;
-		}
 	}
-
-	int tmp_whatever = 0;
-	for( int i = 0; i < nAUs; i++) {
-		SYSLOG("CRPD1.OCD",1,"pAU_nVerts idx "<<i<<" v "<<pAU_nVerts[i].x);
-		tmp_whatever += pAU_nVerts[i].x;
-	}
-
-	for(int j = 0; j < tmp_whatever; j++) {
-		SYSLOG("CRPD1.OCD",1,"pAnimationUnits idx "<<j<<" x "<<pAnimationUnits[j].x<<" y "<<pAnimationUnits[j].y<<" z "<<pAnimationUnits[j].z<<" w "<<pAnimationUnits[j].w);
-	}
-
 	/*int tmp_nVertsAu = (pAU_nVerts[2]).x;
 	for(unsigned int j = 0; j < tmp_nVertsAu; j++) {
 		unsigned int tmp_idx = pAnimationUnits[j+pAU_nVerts[0].x+pAU_nVerts[1].x].w;
@@ -310,8 +302,8 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	//	}
 	//	allNVerts = allNVerts + tmp_nVertsAU;
 	//}
-
 	m_rAnimationData = new CD3D11StructuredDataBuffer(bufDesc, pAnimPositions);
+	m_rAnimationData->SetDebugName("Structured Positions");
 	V_RETURN_HR(m_rAnimationData->CreateOnDevice(pDevice));
 	
 
@@ -345,13 +337,11 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	m_rCBObjectFaceAUs->SetDebugName("CB_PER_OBJECT");
 	V_RETURN_HR(m_rCBObjectFaceAUs->CreateOnDevice(pDevice));
 
-	m_rCBAUs = new CD3D11ConstantBuffer(sizeof(float1)*6);
+	m_rCBAUs = new CD3D11ConstantBuffer(sizeof(CB_PER_AU1));
 	m_rCBAUs->SetDebugName("CB_PER_AU");
 	V_RETURN_HR(m_rCBAUs->CreateOnDevice(pDevice));
 
-	m_rCBAU1s = new CD3D11ConstantBuffer(sizeof(CB_PER_AU1));
-	m_rCBAU1s->SetDebugName("CB_PER_AU1");
-	V_RETURN_HR(m_rCBAU1s->CreateOnDevice(pDevice));
+	
 
 	//samplers
 	CD3D11SamplerStateRef rSamPoint = CD3D11SamplerState::CreatePredefined(CD3D11SamplerState::POINT_CLAMP);
@@ -369,8 +359,8 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 
 	VertexShaderResourceRef rVSTexturedF = UseVSResource(L"VSTexturedF", pDevice, L"Resources\\Shaders\\VS_TexturedF.hlsl", "VSMain");
 	rVSTexturedF->BindConstantBuffer(0, m_rCBObjectFaceAUs);
-	rVSTexturedF->BindConstantBuffer(6, m_rCBAUs);
-	rVSTexturedF->BindConstantBuffer(5, m_rCBAU1s);
+	rVSTexturedF->BindConstantBuffer(4, m_rCBAUs);
+	//rVSTexturedF->BindConstantBuffer(4, m_rCBAU1s);
 
 	m_rTexturedPass = new CD3D11RenderConfig(
 		rVSTextured,
@@ -437,14 +427,11 @@ void CRenderPackDemo1::OnDestroyDevice()
 	m_rTexDepth = NULL;
 	pAnimationUnits = NULL;
 	pAU_nVerts = NULL;
-	
 	m_hWnd = NULL;
 	m_rCam  = NULL;
 	m_rFaceCam = NULL;
 	m_rFreeFlight = NULL;
 	m_rCamControl = NULL;
-	//SYSLOG("OnDestroyDevice",1,"reference Count m_FTHelper "<<m_FTHelper.;
-
 	
 	CSimpleApp11::OnDestroyDevice();
 
@@ -453,17 +440,9 @@ void CRenderPackDemo1::OnDestroyDevice()
 void CRenderPackDemo1::FacetrackingTranslations(FLOAT translationXYZ[3]) {
 
 	m_IsFaceTracked = true;//###
-		float yoffset = 0.001f*0.196545f;
-	/*SYSLOG("FTTranslations",1, "x "<<translationXYZ[0]);
-	SYSLOG("FTTranslations",1, "y "<<translationXYZ[1]);
-	SYSLOG("FTTranslations",1, "z "<<translationXYZ[2]);*/
 	m_currFTTranslationsXYZ[0] = (translationXYZ[0] - m_currFTTranslationsXYZ[0]);
 	m_currFTTranslationsXYZ[1] = (translationXYZ[1] - m_currFTTranslationsXYZ[1]);
 	m_currFTTranslationsXYZ[2] = (translationXYZ[2] - m_currFTTranslationsXYZ[2]);
-
-	//SYSLOG("FTTranslations",1, "cx "<<m_currFTTranslationsXYZ[0]);
-	//SYSLOG("FTTranslations",1, "cy "<<m_currFTTranslationsXYZ[1]);
-	//SYSLOG("FTTranslations",1, "cz "<<m_currFTTranslationsXYZ[2]);
 
 	float cali = .1f;// 0.015f;
 	x0 -= cali*m_currFTTranslationsXYZ[0];
@@ -619,7 +598,7 @@ void CRenderPackDemo1::ParseDataInput() {
 	numOfAllVertsAU = nVertsAU;
 	(pAnimationUnits) = new hlsl::float4[nAUs*numOfFaceVerts]; // bestehen aus den xyz-Werten und dem Indize
 	(pAU_nVerts) = new hlsl::int1[nAUs];
-	(pAU_weights) = new FLOAT[nAUs];
+	(pAU_weights) = new float[6];
 	pAnimationUnits[0] = float4(0.1f,0.1f,0.1f,1.0f);
 	for (int j = 0; j < nAUs*numOfFaceVerts; j++) {
 		pAnimationUnits[j] = float4(0,0,0,1.0f);
@@ -663,13 +642,16 @@ void CRenderPackDemo1::ParseDataInput() {
 
 }
 
-void CRenderPackDemo1::FacetrackingAnimating(FLOAT *pCoefficients, unsigned int AUCount) {
+void CRenderPackDemo1::FacetrackingAnimating(FLOAT *pCoefficients, unsigned int AUCount, FLOAT scale, FLOAT rotationXYZ[3], FLOAT translationXYZ[3] ) {
 	SYSLOG("CRPD1.FTA",1,"ppCoefficients 1 "<<(pCoefficients)[0]<<" pAUCount "<<AUCount);
 	SYSLOG("CRPD1.FTA",1,"ppCoefficients 2 "<<(pCoefficients)[1]<<" pAUCount "<<AUCount);
 	SYSLOG("CRPD1.FTA",1,"ppCoefficients 3 "<<(pCoefficients)[2]<<" pAUCount "<<AUCount);
 	SYSLOG("CRPD1.FTA",1,"ppCoefficients 4 "<<(pCoefficients)[3]<<" pAUCount "<<AUCount);
 	SYSLOG("CRPD1.FTA",1,"ppCoefficients 5 "<<(pCoefficients)[4]<<" pAUCount "<<AUCount);
 	SYSLOG("CRPD1.FTA",1,"ppCoefficients 6 "<<(pCoefficients)[5]<<" pAUCount "<<AUCount);
+
+	m_rFaceRotation.xyz = float3(rotationXYZ[0],rotationXYZ[1],rotationXYZ[2]);
+
 	for(int i = 0; i < AUCount; i++) {
 		pAU_weights[i] = pCoefficients[i];
 		
@@ -678,16 +660,15 @@ void CRenderPackDemo1::FacetrackingAnimating(FLOAT *pCoefficients, unsigned int 
 }
 
 void CRenderPackDemo1::FaceTracking(PVOID pVoid) {
-
-
 	CRenderPackDemo1 * pApp = reinterpret_cast<CRenderPackDemo1*>(pVoid);
 	if (pApp) {
 		IFTResult *pResult = pApp->m_FTHelper.GetResult();
+		//IFTFaceTracker* pFaceTracker = pApp->m_FTHelper.GetTracker();
+		//IFTModel* pModel;
+		//pFaceTracker->GetFaceModel(&pModel);
 		FLOAT* pAU = NULL;
 		UINT numAU;
 		if(pResult && SUCCEEDED(pResult->GetStatus())) {
-	
-			
 			pResult->GetAUCoefficients(&pAU, &numAU);
 			FLOAT scale;
 			FLOAT rotationXYZ[3];
@@ -696,7 +677,8 @@ void CRenderPackDemo1::FaceTracking(PVOID pVoid) {
 
 	//###		pApp->FacetrackingTranslations(translationXYZ);
 			pApp->FacetrackingFrustum(pApp->m_MonitorWidth,pApp->m_MonitorHeight, pApp->m_KinectPosition, translationXYZ);
-			pApp->FacetrackingAnimating(pAU, numAU);
+			pApp->FacetrackingAnimating(pAU, numAU, scale, rotationXYZ, translationXYZ);
+
 		}
 	}
 
@@ -913,7 +895,13 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	hlsl::float4x4 scalerF = hlsl::scale<float,4,4>(hlsl::float3(1500.0,1500.0,1500.0));
 	hlsl::float4x4 scaler = hlsl::scale<float,4,4>(hlsl::float3(10.0,10.0,10.0));
 	hlsl::float4x4 translateMatrix = hlsl::translation<float,4,4>(translateOffset);
+	hlsl::float4x4 rotateMatrixX = hlsl::rotation_x<float, 4, 4>(m_rFaceRotation.x);
+	hlsl::float4x4 rotateMatrixY = hlsl::rotation_y<float, 4, 4>(m_rFaceRotation.y);
+	hlsl::float4x4 rotateMatrixZ = hlsl::rotation_z<float, 4, 4>(m_rFaceRotation.z);
 	mFView = mul(scalerF, mFView);
+	mFView = mul(rotateMatrixX, mFView);
+	mFView = mul(rotateMatrixY, mFView);
+	mFView = mul(rotateMatrixZ, mFView);
 	mView = mul(scaler, mView);
 	mProj = *m_rCam->GetProjMatrix();
 	mFProj = *m_rFaceCam->GetProjMatrix();
@@ -957,38 +945,18 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 		pMappedDataFaceAUs->g_pAU_Weights[auidx] = pAU_weights[auidx];
 		//SYSLOG("CRPD1.OFR",1,"testweight idx "<<auidx<<" v "<<pMappedDataFaceAUs->g_pAU_Weights[auidx]);
 	}
+//	SYSLOG("CRPD1.OFR",1,"testweight idx "<<6<<" v "<<pMappedDataFaceAUs->g_pAU_Weights[6]);
+	//SYSLOG("CRPD1.OFR",1,"testweight idx "<<7<<" v "<<pMappedDataFaceAUs->g_pAU_Weights[7]);
+///	SYSLOG("CRPD1.OFR",1,"testweight idx "<<7<<" v "<<pMappedDataFaceAUs->g_pAU_Weights[8]);
 	/*pMappedDataFaceAUs->g_pAU_Weights[6] = 0.2704f;
 	pMappedDataFaceAUs->g_pAU_Weights[7] = 0.274f; 
 	*/
 	m_rCBAUs->Unmap(pImmediateContext);
 
-	m_rCBAU1s->Map(pImmediateContext);	
-	CB_PER_AU1* pMappedDataFaceAU1s = (CB_PER_AU1*)m_rCBAU1s->GetDataPtr();
-//	hlsl::float4 test[678];//  = {(*pAnimationUnits)};
-	//if(!flag) {
+	//m_rCBAU1s->Map(pImmediateContext);	
 	
-	//for (int g = 0; g < 6; g++) {
-		for( int k = 0; k < 668; k++) {
-	//	test[k] = pAnimationUnits[k];
-		//	if(g == 0) {
-				pMappedDataFaceAU1s->g_pAnimationUnits[k] = pAnimationUnits[k];
-		/*	} else if (g == 1) {
-				pMappedDataFaceAU1s->g_pAnimationUnits2[k] = pAnimationUnits[113+k];
-			} else if (g == 2) {
-				pMappedDataFaceAU1s->g_pAnimationUnits3[k] = pAnimationUnits[g*113+k];
-			} else if (g == 3) {
-				pMappedDataFaceAU1s->g_pAnimationUnits4[k] = pAnimationUnits[g*113+k];
-			} else if (g == 4) {
-				pMappedDataFaceAU1s->g_pAnimationUnits5[k] = pAnimationUnits[g*113+k];
-			} else if (g == 5) {
-				pMappedDataFaceAU1s->g_pAnimationUnits6[k] = pAnimationUnits[g*113+k];
-			}*/
-		
-		//SYSLOG("CRPD1.OFR",1,"test idx "<<k<<" v "<<pMappedDataFaceAU1s->g_pAnimationUnits[k]);
-		}
-//	}
-	//pMappedDataFaceAU1s->g_pAnimationUnits = (test);
-	m_rCBAU1s->Unmap(pImmediateContext);
+
+	//m_rCBAU1s->Unmap(pImmediateContext);
 
 	m_rContextManager->PushRenderTargets(m_rColorTarget);
 	float tester = 6.5f;
@@ -1022,16 +990,7 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	UINT offset = 0;
 	pImmediateContext->IASetVertexBuffers(0,1,&m_vertexBuffer,&stride, &offset);
 
-	//
-	//if(!flag) {
-	//	SYSLOG("CRPD1.OFR",1,"numoffacefaces"<<numOfFaceFaces);
-	//for(int i = 0; i < numOfFaceFaces; i++) {
-	//	//UINT temp2 = dynamic_cast<UINT*>((&m_indexBuffer)[i*sizeof(UINT)]);
-	//	int temp = m_faceIndices[i];
-	//	SYSLOG("CRPD1.OFR",1,"m_indexBuffer "<<i<<" idx "<<temp);
-	//}
-	//flag = true;
-	//}
+
 	//Set Index Buffer
 	pImmediateContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 	pImmediateContext->IASetInputLayout(m_rMeshLayoutFace);
@@ -1043,9 +1002,10 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	
 
 	
-	ID3D11ShaderResourceView* pFacePosSRV = m_rAnimationData->AsSRV();
+	ID3D11ShaderResourceView* pFacePosSRV[2] = {m_rAnimationData->AsSRV(), m_rCBAU1s->AsSRV()};
 
-	pImmediateContext->VSSetShaderResources(0,1, &pFacePosSRV);
+
+	pImmediateContext->VSSetShaderResources(0,2, pFacePosSRV);
 	pImmediateContext->DrawIndexed(numOfFaceFaces,0,1);
 
 	//pImmediateContext->IASetInputLayout(m_rMeshLayoutFace->GetLayout());
