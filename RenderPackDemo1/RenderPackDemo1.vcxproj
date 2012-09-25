@@ -109,6 +109,7 @@
     <None Include="Resources\cup.jpg" />
     <None Include="Resources\cup.mtl" />
     <None Include="Resources\Shaders\Common.hlsl" />
+    <None Include="Resources\Shaders\PS_Face.hlsl" />
     <None Include="Resources\Shaders\PS_FullQuad.hlsl" />
     <None Include="Resources\Shaders\PS_Textured.hlsl" />
     <None Include="Resources\Shaders\VS_FullQuad.hlsl" />

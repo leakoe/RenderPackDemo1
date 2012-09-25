@@ -310,6 +310,8 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	CD3D11RasterizerStateRef rRastSolid = CD3D11RasterizerState::CreatePredefined(CD3D11RasterizerState::SOLID);
 	V_RETURN_HR(rRastSolid->CreateOnDevice(pDevice));
 
+	CD3D11RasterizerStateRef rRastSolidNoCull = CD3D11RasterizerState::CreatePredefined(CD3D11RasterizerState::SOLID_NO_CULL);
+	V_RETURN_HR(rRastSolidNoCull->CreateOnDevice(pDevice));
 
 	CD3D11DepthStencilStateRef rDepthEnable = CD3D11DepthStencilState::CreatePredefined(CD3D11DepthStencilState::ENABLE_DEPTH);
 	V_RETURN_HR(rDepthEnable->CreateOnDevice(pDevice));
@@ -357,6 +359,9 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	PixelShaderResourceRef rPSTextured = UsePSResource(L"PSTextured", pDevice, L"Resources\\Shaders\\PS_Textured.hlsl", "PSMain");
 	rPSTextured->BindSampler(0, rSamLinear);
 
+	PixelShaderResourceRef rPSFace = UsePSResource(L"PSFace", pDevice, L"Resources\\Shaders\\PS_Face.hlsl", "PSMain");
+	rPSTextured->BindSampler(0, rSamLinear);
+
 	VertexShaderResourceRef rVSTexturedF = UseVSResource(L"VSTexturedF", pDevice, L"Resources\\Shaders\\VS_TexturedF.hlsl", "VSMain");
 	rVSTexturedF->BindConstantBuffer(0, m_rCBObjectFaceAUs);
 	rVSTexturedF->BindConstantBuffer(4, m_rCBAUs);
@@ -374,8 +379,8 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	m_rFacePass = new CD3D11RenderConfig(
 		rVSTexturedF,
 		NULL, NULL, NULL, 
-		rPSTextured,
-		rRastWire,
+		rPSFace,
+		rRastSolidNoCull,
 		rDepthDisable,
 		rNoBlend
 		);
@@ -895,9 +900,11 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	hlsl::float4x4 scalerF = hlsl::scale<float,4,4>(hlsl::float3(1500.0,1500.0,1500.0));
 	hlsl::float4x4 scaler = hlsl::scale<float,4,4>(hlsl::float3(10.0,10.0,10.0));
 	hlsl::float4x4 translateMatrix = hlsl::translation<float,4,4>(translateOffset);
-	hlsl::float4x4 rotateMatrixX = hlsl::rotation_x<float, 4, 4>(m_rFaceRotation.x);
-	hlsl::float4x4 rotateMatrixY = hlsl::rotation_y<float, 4, 4>(m_rFaceRotation.y);
-	hlsl::float4x4 rotateMatrixZ = hlsl::rotation_z<float, 4, 4>(m_rFaceRotation.z);
+	//SYSLOG("CRPD1.OFR",1,"translate x "<<m_rFaceRotation.x<<" y "<<m_rFaceRotation.y<<" z "<<m_rFaceRotation.z);
+	hlsl::float4x4 rotateMatrixX = hlsl::rotation_x<float, 4, 4>(m_rFaceRotation.x*(-1)*((2*3.14)/360));
+	hlsl::float4x4 rotateMatrixY = hlsl::rotation_y<float, 4, 4>(m_rFaceRotation.y*(1)*((2*3.14)/360));
+	hlsl::float4x4 rotateMatrixZ = hlsl::rotation_z<float, 4, 4>(m_rFaceRotation.z*(-1)*((3.14)/180));
+
 	mFView = mul(scalerF, mFView);
 	mFView = mul(rotateMatrixX, mFView);
 	mFView = mul(rotateMatrixY, mFView);

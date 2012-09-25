@@ -212,6 +212,9 @@
     <None Include="Resources\Shaders\VS_TexturedF.hlsl">
       <Filter>Resources\Shaders</Filter>
     </None>
+    <None Include="Resources\Shaders\PS_Face.hlsl">
+      <Filter>Resources\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="RenderPackDemo1.rc" />
