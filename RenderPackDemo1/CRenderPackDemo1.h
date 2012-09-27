@@ -93,7 +93,7 @@ protected:
 
 	hlsl::float4 *pAnimationUnits;
 	hlsl::int1 * pAU_nVerts;
-	float * pAU_weights;
+	hlsl::float4 pAU_weights[6];
 	int nAUs;
 
 

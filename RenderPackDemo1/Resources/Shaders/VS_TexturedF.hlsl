@@ -17,7 +17,7 @@ StructuredBuffer<float3> 	g_Positions		: register(t0);
 //per AU
 cbuffer m_rCBAUs : register(b4) {
 	//int  g_pAU_nVerts[6];
-	float g_pAU_Weights[6];
+	float4 g_pAU_Weights[6];
 }
 //
 StructuredBuffer<float4> g_pAnimationUnits: register(t1);
@@ -37,11 +37,13 @@ VS_OUTPUT VSMain( VS_INPUT Input, uint vidx	: SV_VertexID )
 	float4 vpos = float4(g_Positions[vidx], 1.0f);
 	float3 nnorm = float3(g_Positions[vidx]);
 	for(uint auidx = 0; auidx < 6; auidx++) {
-			vpos.xyz += g_pAU_Weights[auidx]*g_pAnimationUnits[auidx*113+vidx].xyz;
+			vpos.xyz += g_pAU_Weights[auidx].x * g_pAnimationUnits[auidx*113+vidx].xyz;
 	}
+	//uint auidx = 4;
+	//vpos.xyz += g_pAU_Weights[0] * g_pAnimationUnits[auidx*113+vidx].xyz;
 	Output.pos = mul( vpos, g_mWorldViewProj );
 
-	float normal =1/sqrt(nnorm.x*nnorm.x + nnorm.y*nnorm.y + nnorm.z*nnorm.z);
+	/*float normal =1/sqrt(nnorm.x*nnorm.x + nnorm.y*nnorm.y + nnorm.z*nnorm.z);
 
 	Output.norm = float3(nnorm.x/normal, nnorm.y/normal, nnorm.z/normal);
 	if(vidx > 18 && vidx < 25) {
@@ -52,7 +54,8 @@ VS_OUTPUT VSMain( VS_INPUT Input, uint vidx	: SV_VertexID )
 	}
 		if(vidx > 0 && vidx < 111) {
 		Output.norm = float3(nnorm.x/normal + 0.15, nnorm.y/normal+ 0.15, nnorm.z/normal+ 0.15);
-	}
+	}*/
+	Output.norm= float3(0,0,0);
 	
 	return Output;
 }

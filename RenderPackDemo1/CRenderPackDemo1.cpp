@@ -40,7 +40,7 @@
 	};
 */
 struct CB_PER_AU {
-	float g_pAU_Weights[6];
+	hlsl::float4 g_pAU_Weights[6];
 };
 
 struct CB_PER_AU1 {
@@ -339,7 +339,7 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 	m_rCBObjectFaceAUs->SetDebugName("CB_PER_OBJECT");
 	V_RETURN_HR(m_rCBObjectFaceAUs->CreateOnDevice(pDevice));
 
-	m_rCBAUs = new CD3D11ConstantBuffer(sizeof(CB_PER_AU1));
+	m_rCBAUs = new CD3D11ConstantBuffer(sizeof(CB_PER_AU));
 	m_rCBAUs->SetDebugName("CB_PER_AU");
 	V_RETURN_HR(m_rCBAUs->CreateOnDevice(pDevice));
 
@@ -380,7 +380,7 @@ void  CRenderPackDemo1::MonitorInputs(char *string) {
 		rVSTexturedF,
 		NULL, NULL, NULL, 
 		rPSFace,
-		rRastSolidNoCull,
+		rRastWire,
 		rDepthDisable,
 		rNoBlend
 		);
@@ -423,7 +423,6 @@ void CRenderPackDemo1::OnDestroyDevice()
 	m_rMeshLayoutFace = NULL;
 	m_rMeshResourceFace = NULL;
 	m_rRenderMeshFace = NULL;
-	m_TurnStatus[6] = NULL;
 	translateOffset = NULL;
 	m_rAnimationData = NULL;
 	m_rColorTarget = NULL;
@@ -438,6 +437,8 @@ void CRenderPackDemo1::OnDestroyDevice()
 	m_rFreeFlight = NULL;
 	m_rCamControl = NULL;
 	
+	ZeroMemory(m_TurnStatus, sizeof(m_TurnStatus));
+
 	CSimpleApp11::OnDestroyDevice();
 
 }
@@ -603,7 +604,6 @@ void CRenderPackDemo1::ParseDataInput() {
 	numOfAllVertsAU = nVertsAU;
 	(pAnimationUnits) = new hlsl::float4[nAUs*numOfFaceVerts]; // bestehen aus den xyz-Werten und dem Indize
 	(pAU_nVerts) = new hlsl::int1[nAUs];
-	(pAU_weights) = new float[6];
 	pAnimationUnits[0] = float4(0.1f,0.1f,0.1f,1.0f);
 	for (int j = 0; j < nAUs*numOfFaceVerts; j++) {
 		pAnimationUnits[j] = float4(0,0,0,1.0f);
@@ -658,7 +658,7 @@ void CRenderPackDemo1::FacetrackingAnimating(FLOAT *pCoefficients, unsigned int 
 	m_rFaceRotation.xyz = float3(rotationXYZ[0],rotationXYZ[1],rotationXYZ[2]);
 
 	for(int i = 0; i < AUCount; i++) {
-		pAU_weights[i] = pCoefficients[i];
+		pAU_weights[i].x = pCoefficients[i];
 		
 	}
 
