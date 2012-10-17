@@ -860,9 +860,14 @@ void CRenderPackDemo1::FacetrackingFrustum(float monitorWidth, float monitorHeig
 	float calibration = 2.75f;//slow down motions
 
 	if(kinectPosition < 0) {
-		y0 = -0.5*(monitorHeight + calibration*translationsKinectXYZ[1]);
-		y1 = -0.5*(calibration*translationsKinectXYZ[1] - monitorHeight);
+		/*y0 = (monitorHeight/2 - calibration*translationsKinectXYZ[1]);
+		y1 = (-calibration*translationsKinectXYZ[1] + monitorHeight*(3/2));*/
+		y0 = -0.5*(- monitorHeight + monitorHeight + 2*calibration*translationsKinectXYZ[1]) + monitorHeight;
+		y1 = -0.5*(2*calibration*translationsKinectXYZ[1] - 2*monitorHeight) + monitorHeight;
 	} else if (kinectPosition > 0) {
+		/*y0 = (-calibration*translationsKinectXYZ[1] - (3/2)*monitorHeight);
+		y1 = (-calibration*translationsKinectXYZ[1] - monitorHeight/2);*/
+
 		y0 = 0.5*(calibration*translationsKinectXYZ[1] - monitorHeight);
 		y1 = 0.5*(calibration*translationsKinectXYZ[1] + monitorHeight);
 	}
@@ -911,6 +916,7 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	mFView = mul(rotateMatrixZ, mFView);
 	mView = mul(scaler, mView);
 	mProj = *m_rCam->GetProjMatrix();
+	mProj = mul(translateMatrix, mProj);
 	mFProj = *m_rFaceCam->GetProjMatrix();
 
 	if(m_IsFaceTracked) {//####
@@ -1013,7 +1019,7 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 
 
 	pImmediateContext->VSSetShaderResources(0,2, pFacePosSRV);
-	pImmediateContext->DrawIndexed(numOfFaceFaces,0,1);
+	//pImmediateContext->DrawIndexed(numOfFaceFaces,0,1);
 
 	//pImmediateContext->IASetInputLayout(m_rMeshLayoutFace->GetLayout());
 	//m_rRenderMeshFace->BeginDraw(pImmediateContext);
