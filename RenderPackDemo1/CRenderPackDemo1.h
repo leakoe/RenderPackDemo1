@@ -96,7 +96,11 @@ protected:
 	hlsl::float4 pAU_weights[6];
 	int nAUs;
 
+	float3  *m_smoother;
+	int pointToSmooth;
+	float smoothflag;
 
+	float3 m_translateOffset2;
 	 float m_MonitorWidth;
 	 float m_MonitorHeight;
 	 float m_KinectPosition;

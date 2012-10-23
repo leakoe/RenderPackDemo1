@@ -106,6 +106,14 @@ bool CRenderPackDemo1::Init()
 		j++;
 	}
 
+	m_smoother = new hlsl::float3[10];
+	smoothflag = false;
+	pointToSmooth = 0;
+	for (int n = 0; n <  10; n++) {
+		m_smoother[n] = float3(0,0,0);
+	}
+
+	m_translateOffset2 = float3(0,0,0);
 	
 	NUI_IMAGE_RESOLUTION depthRes = NUI_IMAGE_RESOLUTION_320x240;
 	NUI_IMAGE_RESOLUTION colorRes = NUI_IMAGE_RESOLUTION_640x480;
@@ -457,9 +465,9 @@ void CRenderPackDemo1::FacetrackingTranslations(FLOAT translationXYZ[3]) {
 	y1 -= cali*m_currFTTranslationsXYZ[1];
 	z0 -= cali*m_currFTTranslationsXYZ[2];
 	z1 -= cali*m_currFTTranslationsXYZ[2];
-	translateOffset[0] += cali*m_currFTTranslationsXYZ[0];
-	translateOffset[1] += cali*m_currFTTranslationsXYZ[1];
-	translateOffset[2] += cali*m_currFTTranslationsXYZ[2];
+	//translateOffset[0] += cali*m_currFTTranslationsXYZ[0];
+	//translateOffset[1] += cali*m_currFTTranslationsXYZ[1];
+	//translateOffset[2] += cali*m_currFTTranslationsXYZ[2];
 	m_currFTTranslationsXYZ[0] = translationXYZ[0];
 	m_currFTTranslationsXYZ[1] = translationXYZ[1];
 	m_currFTTranslationsXYZ[2] = translationXYZ[2];
@@ -858,7 +866,32 @@ void CRenderPackDemo1::FacetrackingFrustum(float monitorWidth, float monitorHeig
 	//SYSLOG("CRPD1::FTF",1," translationX "<<translationsKinectXYZ[0]<<" translationY "<<translationsKinectXYZ[1]<<" translationZ "<<translationsKinectXYZ[2]);
 
 	float calibration = 2.75f;//slow down motions
+	float y0_tmp = y0;
+	float y1_tmp = y1;
+	float x0_tmp = x0;
+	float x1_tmp = x1;
+	float z0_tmp = z0;
+	if(pointToSmooth > 9) {
+		smoothflag = true;
+		pointToSmooth = 0;
+	}
+	m_smoother[pointToSmooth++] = float3(translationsKinectXYZ[0],translationsKinectXYZ[1],translationsKinectXYZ[2]);
 
+	if (smoothflag) {
+		translationsKinectXYZ[0] = 0;
+		translationsKinectXYZ[1] = 0;
+		translationsKinectXYZ[2] = 0;
+		for(int i =0; i < 10; i++) {
+			translationsKinectXYZ[0] += m_smoother[i].x;
+			translationsKinectXYZ[1] += m_smoother[i].y;
+			translationsKinectXYZ[2] += m_smoother[i].z;
+		}
+		translationsKinectXYZ[0] = translationsKinectXYZ[0]/10.0;
+		translationsKinectXYZ[1] = translationsKinectXYZ[1]/10.0;
+		translationsKinectXYZ[2] = translationsKinectXYZ[2]/10.0;
+	}
+	
+	
 	if(kinectPosition < 0) {
 		/*y0 = (monitorHeight/2 - calibration*translationsKinectXYZ[1]);
 		y1 = (-calibration*translationsKinectXYZ[1] + monitorHeight*(3/2));*/
@@ -882,9 +915,12 @@ void CRenderPackDemo1::FacetrackingFrustum(float monitorWidth, float monitorHeig
 
 	
 	m_ftfrustum = hlsl::frustum(x0,x1,y0,y1,z0,z1);
-	float xOffset = monitorWidth/2 - x1;
-	float yOffset = monitorHeight/2 -y1;
-	translateOffset = float3(xOffset, yOffset, z0);
+	float xOffset = x1_tmp - monitorWidth/2 - x1;
+	float yOffset = y1_tmp - monitorHeight/2 -y1;
+	float zOffset = z0_tmp - z0;
+	m_translateOffset2 =  float3(xOffset, yOffset, zOffset);
+	//hlsl::float4x4 translateMatrix = hlsl::translation<float,4,4>(translateOffset2);
+//	m_ftfrustum = mul(translateMatrix, m_ftfrustum);
 
 	//SYSLOG("CRPD1::FTF",1,"x1-x0 "<<(x1-x0)<<" y1-y0 "<<(y1-y0)<<" y1/z0 "<<(y1/z0));
 	//SYSLOG("CRenderPackDemo1-FrameRender",1,"onframerender "<<x0<<" "<<x1<<" "<<y0<<" "<<y1<<" "<<z0<<" "<<z1);
@@ -904,7 +940,7 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	mFView = *m_rFaceCam->GetViewMatrix();
 	hlsl::float4x4 scalerF = hlsl::scale<float,4,4>(hlsl::float3(1500.0,1500.0,1500.0));
 	hlsl::float4x4 scaler = hlsl::scale<float,4,4>(hlsl::float3(10.0,10.0,10.0));
-	hlsl::float4x4 translateMatrix = hlsl::translation<float,4,4>(translateOffset);
+	hlsl::float4x4 translateMatrix = hlsl::translation<float,4,4>(m_translateOffset2);
 	//SYSLOG("CRPD1.OFR",1,"translate x "<<m_rFaceRotation.x<<" y "<<m_rFaceRotation.y<<" z "<<m_rFaceRotation.z);
 	hlsl::float4x4 rotateMatrixX = hlsl::rotation_x<float, 4, 4>(m_rFaceRotation.x*(-1)*((2*3.14)/360));
 	hlsl::float4x4 rotateMatrixY = hlsl::rotation_y<float, 4, 4>(m_rFaceRotation.y*(1)*((2*3.14)/360));
@@ -914,14 +950,17 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	mFView = mul(rotateMatrixX, mFView);
 	mFView = mul(rotateMatrixY, mFView);
 	mFView = mul(rotateMatrixZ, mFView);
-	mView = mul(scaler, mView);
+	
 	mProj = *m_rCam->GetProjMatrix();
-	mProj = mul(translateMatrix, mProj);
+	
 	mFProj = *m_rFaceCam->GetProjMatrix();
-
+	translateOffset = float3(0,0.0f,0);
 	if(m_IsFaceTracked) {//####
 		mProj =  m_ftfrustum;
+		mView = mul(translateMatrix, mView);
 	}//###
+
+	mView = mul(scaler, mView);
 	//mView = hlsl::frustum(0.1f,0.3f,0.1f,0.3f,0.3f,0.2f);
 	// use custom projection
 	//	mProj = (hlsl::frustum(.1f,0.3f,.1f,.3f,.30f,.2f));
@@ -960,7 +999,7 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 	}
 //	SYSLOG("CRPD1.OFR",1,"testweight idx "<<6<<" v "<<pMappedDataFaceAUs->g_pAU_Weights[6]);
 	//SYSLOG("CRPD1.OFR",1,"testweight idx "<<7<<" v "<<pMappedDataFaceAUs->g_pAU_Weights[7]);
-///	SYSLOG("CRPD1.OFR",1,"testweight idx "<<7<<" v "<<pMappedDataFaceAUs->g_pAU_Weights[8]);
+//	SYSLOG("CRPD1.OFR",1,"testweight idx "<<7<<" v "<<pMappedDataFaceAUs->g_pAU_Weights[8]);
 	/*pMappedDataFaceAUs->g_pAU_Weights[6] = 0.2704f;
 	pMappedDataFaceAUs->g_pAU_Weights[7] = 0.274f; 
 	*/
@@ -1019,7 +1058,7 @@ void CRenderPackDemo1::OnFrameRender(ID3D11Device* pDevice, ID3D11DeviceContext*
 
 
 	pImmediateContext->VSSetShaderResources(0,2, pFacePosSRV);
-	//pImmediateContext->DrawIndexed(numOfFaceFaces,0,1);
+	pImmediateContext->DrawIndexed(numOfFaceFaces,0,1);
 
 	//pImmediateContext->IASetInputLayout(m_rMeshLayoutFace->GetLayout());
 	//m_rRenderMeshFace->BeginDraw(pImmediateContext);
