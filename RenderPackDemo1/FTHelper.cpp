@@ -219,12 +219,10 @@ DWORD WINAPI FTHelper::FaceTrackingThread()
         m_KinectSensor.GetDepthConfiguration(&depthConfig);
         pDepthConfig = &depthConfig;
         m_hint3D[0] = m_hint3D[1] = FT_VECTOR3D(0, 0, 0);
-		SYSLOG("FTHelper.FaceTrackingThread",1,"m_KinectSensor Init succeeded");
     }
     else
     {
         m_KinectSensorPresent = FALSE;
-		SYSLOG("FTHelper.FaceTrackingThread",1,"m_KinectSensor Init did not succeed");
         WCHAR errorText[MAX_PATH];
         ZeroMemory(errorText, sizeof(WCHAR) * MAX_PATH);
         wsprintf(errorText, L"Could not initialize the Kinect sensor. hr=0x%x\n", hr);

@@ -1,10 +1,10 @@
 //////////////////////////////////////////////////////////////////////////
-//		CRenderPackDemo2.h	
-//		*******************************************************									
+// CRenderPackDemo2.h
+// *******************************************************
 //
-//		Declaration of your main application class.
-//		RenderPack Wizard generated file.
-//		
+// Declaration of your main application class.
+// RenderPack Wizard generated file.
+//
 //////////////////////////////////////////////////////////////////////////
 
 
@@ -36,12 +36,12 @@ using namespace RenderPack;
 class CRenderPackDemo1
 	:public CSimpleApp11
 {
-public: 
+public:
 
 	CRenderPackDemo1();
 
 	virtual ~CRenderPackDemo1();
-	
+
 	int main() {}
 
 	// CSimpleApp11
@@ -51,10 +51,9 @@ public:
 	virtual HRESULT OnCreateDevice(ID3D11Device* pDevice);
 	virtual void OnDestroyDevice();
 	void FacetrackingFrustum(float monitorWidth, float monitorHeight, float kinectPosition, FLOAT translationsKinectXYZ[3]);
-	void ProcessKinectIO();
 
 	virtual HRESULT OnSwapChainResized(ID3D11Device* pDevice, IDXGISwapChain* pSwapChain,
-                                          const DXGI_SURFACE_DESC* pBackBufferSurfaceDesc);
+		const DXGI_SURFACE_DESC* pBackBufferSurfaceDesc);
 	virtual void OnSwapChainReleasing();
 
 
@@ -70,7 +69,6 @@ public:
 
 	static void FaceTracking(LPVOID lpParam);
 
-	void MonitorInputs(char *string) ;
 
 	void FacetrackingTranslations(FLOAT translationXYZ[3]);
 
@@ -82,44 +80,40 @@ protected:
 
 	void CRenderPackDemo1::ParseObjInput();
 
-		// render targets 
-	CD3D11RenderTexture2DRef m_rTexFaceColor;
-
-	CD3D11RenderTexture2DRef m_rTexColor; 
-	CD3D11DepthTexture2DRef m_rTexDepth; 
+	// render targets
+	CD3D11RenderTexture2DRef m_rTexColor;
+	CD3D11DepthTexture2DRef m_rTexDepth;
 	CD3D11RenderTargetConfigRef m_rColorTarget;
 
-	bool isTracked;
 
 	hlsl::float4 *pAnimationUnits;
 	hlsl::int1 * pAU_nVerts;
 	hlsl::float4 pAU_weights[6];
 	int nAUs;
 
-	float3  *m_smoother;
+	float3 *m_smoother;
 	int pointToSmooth;
 	float smoothflag;
 
 	float3 m_translateOffset2;
-	 float m_MonitorWidth;
-	 float m_MonitorHeight;
-	 float m_KinectPosition;
+	float m_MonitorWidth;
+	float m_MonitorHeight;
+	float m_KinectPosition;
 	//Controller
 	enum STATUS_EYE {
-				TURN_UP = 0,
-				TURN_DOWN = 1,
-				TURN_LEFT = 2,	
-				TURN_RIGHT = 3,
-				TURN_CLOSE = 4,
-				TURN_AWAY = 5
-			};
+		TURN_UP = 0,
+		TURN_DOWN = 1,
+		TURN_LEFT = 2,
+		TURN_RIGHT = 3,
+		TURN_CLOSE = 4,
+		TURN_AWAY = 5
+	};
 	float x0;
 	float x1;
 	float y0;
 	float y1;
 	float z0;
 	float z1;
-	float m_MoveSpeed;
 	bool m_TurnStatus[6];
 	bool m_reset;
 	bool m_IsFaceTracked;
@@ -137,20 +131,17 @@ protected:
 
 	//scene Model
 	CTriMeshResourceRef m_rMeshResource;
-	CTriMeshResourceRef m_rMeshResourceFace;
 	CCameraRef m_rCam;
 	CCameraRef m_rFaceCam;
 	CFreeFlightControllerRef m_rFreeFlight;
 	CCameraControllerRef m_rCamControl;
 
 	CD3D11RenderMeshRef m_rRenderMesh;
-	CD3D11RenderMeshRef m_rRenderMeshFace;
 	CD3D11InputLayoutRef m_rMeshLayout;
 	ID3D11InputLayout *m_rMeshLayoutFace;
 
 	//vertexBuffer for the FaceMesh
 	hlsl::vector<float,4> * m_vertexData;
-	//std::vector<hlsl::float4>* m_vertexData;
 
 	ID3D11Buffer* m_vertexBuffer;
 
@@ -161,16 +152,14 @@ protected:
 	ID3D11Buffer* m_indexBuffer;
 	int *m_faceIndices;
 
-	bool flag;
 
-	
 	//constant buffers
 	CD3D11ConstantBufferRef m_rCBObjectTransform;
-	CD3D11ConstantBufferRef m_rCBObjectFaceAUs;
+	CD3D11ConstantBufferRef m_rCBObjectFaceTransform;
 	CD3D11ConstantBufferRef m_rCBAUs;
-	CD3D11StructuredDataBufferRef m_rCBAU1s;
+	CD3D11StructuredDataBufferRef m_rSDBAnimationUnits;
 
-	CD3D11StructuredDataBufferRef	m_rAnimationData;
+	CD3D11StructuredDataBufferRef m_rAnimationData;
 
 	//full screen squad:
 	CD3D11DirectGeometryRef m_rRenderFullQuad;

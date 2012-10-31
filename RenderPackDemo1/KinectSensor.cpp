@@ -24,8 +24,8 @@ KinectSensor::KinectSensor()
     m_VideoBuffer = NULL;
     m_DepthBuffer = NULL;
     m_ZoomFactor = 1.0f;
-    m_ViewOffset.x =0;//1.320291f;//.0247174f;
-    m_ViewOffset.y = 0;// 0.161545f;//1.9854f;//.02978f;
+    m_ViewOffset.x =0;
+    m_ViewOffset.y = 0;
 }
 
 KinectSensor::~KinectSensor()

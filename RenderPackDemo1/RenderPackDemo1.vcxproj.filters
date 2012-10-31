@@ -203,16 +203,7 @@
       <Filter>Resources</Filter>
     </None>
     <None Include="monitor.txt" />
-    <None Include="Resources\cup.jpg">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="Resources\cup.mtl">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="Resources\Shaders\VS_TexturedF.hlsl">
-      <Filter>Resources\Shaders</Filter>
-    </None>
-    <None Include="Resources\Shaders\PS_Face.hlsl">
+    <None Include="Resources\Shaders\VS_Face.hlsl">
       <Filter>Resources\Shaders</Filter>
     </None>
   </ItemGroup>
